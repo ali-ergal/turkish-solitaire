@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Solitaire Tarzı Kart Oyunu</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="menu-bar">
+        <button id="resetBtn">🔄 Yeni Oyun</button>
+      </div>
+
+    <div class="game-area">
+        <div class="left-side">
+            <div id="deck" class="deck" title="Kart çekmek için tıkla"></div>
+            <div id="drawnCards" class="drawn-area"></div>
+          </div>
+
+        <div id="table" class="table-area"></div>
+    </div>
+    <div class="undo-wrapper">
+        <button id="undoBtn">↩️ Geri Al</button>
+      </div>
+    <div id="counters" class="counters">
+        <span id="moveCounter">Hamle: 0</span> |
+        <span id="scoreCounter">Skor: 0</span> |
+        <span id="timer">Süre: 0:00</span>
+    </div>
+    <div id="status" class="status"></div>
+
+    <div id="debugPanel" style="margin-top: 20px; font-family: monospace; color: #ccc;">
+        <strong>Kalan Kartlar (deck):</strong>
+        <div id="remainingCards" style="margin-top: 5px;"></div>
+    </div>
+
+
+    <audio id="dropSound" src="sounds/card-drop.mp3" preload="auto"></audio>
+    <audio id="newTurnSound" src="sounds/new-turn.mp3" preload="auto"></audio>
+
+    <script src="game.js"></script>
+</body>
+
+</html>

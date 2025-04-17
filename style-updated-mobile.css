@@ -1,0 +1,30 @@
+
+@media (max-width: 768px) {
+  .game-area {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .left-side {
+    justify-content: center;
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .card-img {
+    width: 80px !important;
+    height: 120px !important;
+  }
+
+  .series-container {
+    width: 80px !important;
+    height: 120px !important;
+  }
+
+  .deck,
+  .drawn-area {
+    width: 80px !important;
+    height: 120px !important;
+  }
+}

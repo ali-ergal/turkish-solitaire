@@ -1,0 +1,148 @@
+
+/* Genel stiller */
+body {
+  background-color: #006400;
+  color: white;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: white;
+}
+
+/* Oyun alanı */
+.game-area {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
+  gap: 20px;
+}
+
+/* Kapalı deste ve açılan kartlar */
+.left-side {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-left: 0;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+
+/* Kapalı kart kutusu */
+.deck {
+  width: 80px;
+  height: 120px;
+  background-image: url('cards/back.png');
+  background-size: cover;
+  border: 1px solid #fff;
+  border-radius: 8px;
+}
+
+/* Açılan kart kutusu */
+.drawn-area {
+  width: 80px;
+  height: 120px;
+  position: relative;
+}
+
+/* Kart görseli */
+.card-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 5px;
+}
+
+.card-img.selected {
+  outline: 2px solid yellow;
+}
+
+/* Masa (8 seri → 4 x 2 grid) */
+.table-area {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, auto);
+  gap: 8px;
+  max-width: 500px;
+  width: 100%;
+}
+
+/* Seri kutuları */
+.series-container {
+  width: 80px;
+  height: 120px;
+  background-color: rgba(255,255,255,0.1);
+  border: 1px dashed #ccc;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sayaçlar */
+.counters {
+  margin: 10px 0;
+}
+
+/* Status alanı */
+.status {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+/* Animasyonlu uçan kart */
+.flying-card {
+  position: fixed;
+  width: 80px;
+  height: auto;
+  pointer-events: none;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  z-index: 1000;
+}
+
+/* Kapalı deste boşsa stil */
+.deck.empty {
+  background: none;
+  border: 1px dashed #888;
+}
+
+/* Mobil görünüm */
+@media (max-width: 768px) {
+  .game-area {
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  .left-side {
+    justify-content: center;
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .table-area {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, auto);
+    max-width: 90%;
+  }
+
+  .card-img {
+    width: 65px;
+  }
+
+  .series-container {
+    width: 65px;
+    height: 100px;
+  }
+}
