@@ -18,15 +18,15 @@ let lastDrawCount = 0; // en son kaç kart çekildi (1, 2, 3 olabilir)
 let undoEnabled = false;
 
 const seriesInfo = [
-    { suit: "♥", direction: "asc", label: "1: As ♥ yukarı" },
-    { suit: "♣", direction: "asc", label: "3: As ♣ yukarı" },
-    { suit: "♦", direction: "asc", label: "7: As ♦ yukarı" },
-    { suit: "♠", direction: "asc", label: "5: As ♠ yukarı" },
+    { suit: "♥", direction: "asc", label: "As ♥", card_image: "ace_of_hearts.png" },
+    { suit: "♣", direction: "asc", label: "As ♣", card_image: "ace_of_spades.png" },
+    { suit: "♦", direction: "asc", label: "As ♦", card_image: "ace_of_diamonds.png" },
+    { suit: "♠", direction: "asc", label: "As ♠", card_image: "ace_of_clubs.png" },
 
-    { suit: "♥", direction: "desc", label: "2: Papaz ♥ aşağı" },
-    { suit: "♣", direction: "desc", label: "4: Papaz ♣ aşağı" },
-    { suit: "♦", direction: "desc", label: "8: Papaz ♦ aşağı" },
-    { suit: "♠", direction: "desc", label: "6: Papaz ♠ aşağı" },
+    { suit: "♥", direction: "desc", label: "Papaz ♥", card_image: "king_of_hearts.png" },
+    { suit: "♣", direction: "desc", label: "Papaz ♣", card_image: "king_of_spades.png" },
+    { suit: "♦", direction: "desc", label: "Papaz ♦", card_image: "ace_of_diamonds.png" },
+    { suit: "♠", direction: "desc", label: "Papaz ♠", card_image: "ace_of_clubs.png" },
 ];
 
 if(debug){
@@ -275,6 +275,7 @@ function formatCard(card) {
 }
 
 function updateUI() {
+
     // 🂠 Kapalı deste görselini kontrol et
     const deckEl = document.getElementById("deck");
     if (drawIndex >= deck.length) {
@@ -348,6 +349,15 @@ function updateUI() {
             img.alt = formatCard(top);
             img.className = "card-img";
             container.appendChild(img);
+            container.classList.remove("empty");
+            container.removeAttribute("data-label");
+        }else{
+            container.classList.add("empty");
+
+            const { suit, direction } = seriesInfo[index];
+            const base = direction === "asc" ? "as" : "king";
+            const suitMap = { "♠": "spades", "♥": "hearts", "♦": "diamonds", "♣": "clubs" };
+            container.classList.add(`${base}-${suitMap[suit]}`);
         }
 
         tableDiv.appendChild(container);
