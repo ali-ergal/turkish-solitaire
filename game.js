@@ -16,6 +16,11 @@ let selectedCard = null; // mobil seçim için
 let completedSuits = []; // ["♥", "♠", ...] buraya ekleyeceğiz
 let lastDrawCount = 0; // en son kaç kart çekildi (1, 2, 3 olabilir)
 let undoEnabled = false;
+let difficultyLevel = 3;
+
+let hintTimeout = null;
+
+let autoHintEnabled = true;
 
 const seriesInfo = [
     { suit: "♥", direction: "asc", label: "As ♥", card_image: "ace_of_hearts.png" },
@@ -29,13 +34,16 @@ const seriesInfo = [
     { suit: "♠", direction: "desc", label: "Papaz ♠", card_image: "ace_of_clubs.png" },
 ];
 
-if(debug){
+if (debug) {
     document.getElementById("debugPanel").style.display = "block";
-}else{
+} else {
     document.getElementById("debugPanel").style.display = "none";
 }
 
 function createDeck() {
+    const winModal = document.getElementById("winModal");
+    if (winModal) winModal.style.display = "none";
+    difficultyLevel = Number(document.getElementById("difficultySelect").value);
     deck = [];
     completedSuits = [];
     for (let suit of suits) {
@@ -51,6 +59,12 @@ function createDeck() {
     moveCount = 0;
     score = 0;
     updateCounters();
+
+    const toggle = document.getElementById("autoHintToggle");
+    if (toggle) {
+        autoHintEnabled = toggle.checked;
+        localStorage.setItem("autoHint", autoHintEnabled ? "1" : "0");
+    }
 
     updateUI();
     startTime = Date.now();
@@ -68,36 +82,48 @@ function drawThree() {
     // Eğer deste bitti ve hiç kart yerleştirilememişse: kaybettin
     if (drawIndex >= deck.length) {
         if (turdaYerlesenKartSayisi === 0) {
-            document.getElementById("status").innerText = "💀 Oyun bitti! Hiç kart yerleştiremedin.";
+            document.getElementById("status").innerHTML = `
+              💀 Oyun bitti! Hiç kart yerleştiremedin.
+              <br><button onclick="openSettingsFromLoss()">🔁 Tekrar Dene</button>
+            `;
             return;
         }
-    
+
         // Yeni tur başlatılıyor
         drawIndex = 0;
         turdaYerlesenKartSayisi = 0;
         drawnCards = [];
         selectedCard = null;
         removeHighlight();
-    
+
         playNewTurnSound();
-    
+
         const deckEl = document.getElementById("deck");
         deckEl.classList.add("flash");
         setTimeout(() => deckEl.classList.remove("flash"), 500);
-    
+
         document.getElementById("status").innerText = "🔁 Yeni tura geçildi.";
-    
+
         updateUI();
-    
+
         // ❗Yeni turda kart açma yok
         return;
     }
 
     // ✅ Kalan kart sayısına göre esnek çekim
     const remaining = deck.length - drawIndex;
-    const drawCount = Math.min(3, remaining);
+    const drawCount = Math.min(difficultyLevel, remaining);
     lastDrawCount = drawCount;
     undoEnabled = true;
+
+    // 🕒 3 saniye sonra otomatik ipucu ver
+    if (hintTimeout) clearTimeout(hintTimeout);
+
+    if (autoHintEnabled) {
+        hintTimeout = setTimeout(() => {
+            showHint();
+        }, 3000);
+    }
 
     for (let i = 0; i < drawCount; i++) {
         let card = deck[drawIndex];
@@ -105,6 +131,11 @@ function drawThree() {
         drawnCards.push(card);
         drawIndex++;
     }
+
+    // Her çekimden sonra otomatik ipucu ver
+    setTimeout(() => {
+        showHint(); // 💡 Otomatik ipucu
+    }, 300); // çok hızlı olmaması için kısa bir gecikme
 
     updateUI();
 }
@@ -127,6 +158,8 @@ function canPlaceCardOnSeries(seriesIndex, card) {
 
 function placeCardOnSeries(index) {
     if (drawnCards.length === 0) return;
+
+    if (hintTimeout) clearTimeout(hintTimeout);
 
     const card = drawnCards[drawnCards.length - 1];
 
@@ -179,8 +212,25 @@ function placeCardOnSeries(index) {
                 finalMessage += `\n🎉 Yeni rekor!`;
             }
             updateCounters();
-            document.getElementById("status").innerText = finalMessage;
             clearInterval(timerInterval);
+            document.getElementById("status").innerText = "";
+
+            // 🃏 Kartları uçur
+            document.querySelectorAll(".card-img").forEach((img, i) => {
+                setTimeout(() => {
+                    img.classList.add("win-fly");
+                }, i * 50);
+            });
+
+            // 🏆 Modal göster
+            setTimeout(() => {
+                const modal = document.getElementById("winModal");
+                const winStats = document.getElementById("winStats");
+                winStats.innerText = finalMessage.replaceAll("\n", "\n");
+                triggerWinCelebration(); // 🎊 Konfeti + ses
+                modal.style.display = "flex";
+
+            }, 1000);
         }
     } else {
         document.getElementById("status").innerText = "⛔ Bu kart bu seriye konulamaz.";
@@ -351,7 +401,7 @@ function updateUI() {
             container.appendChild(img);
             container.classList.remove("empty");
             container.removeAttribute("data-label");
-        }else{
+        } else {
             container.classList.add("empty");
 
             const { suit, direction } = seriesInfo[index];
@@ -502,10 +552,116 @@ function updateTimer() {
     document.getElementById("timer").innerText = `Süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
+function showHint() {
+    if (drawnCards.length === 0) {
+        document.getElementById("status").innerText = "🤔 Açık kart yok.";
+        return;
+    }
+
+    const topCard = drawnCards[drawnCards.length - 1];
+    let targetIndex = -1;
+
+    for (let i = 0; i < table.length; i++) {
+        if (canPlaceCardOnSeries(i, topCard)) {
+            targetIndex = i;
+            break;
+        }
+    }
+
+    if (targetIndex === -1) {
+        document.getElementById("status").innerText = "🟨 Bu kartı koyacak yer yok.";
+    } else {
+        const seriesEl = document.querySelectorAll(".series-container")[targetIndex];
+        seriesEl.classList.add("hint");
+
+        setTimeout(() => {
+            seriesEl.classList.remove("hint");
+        }, 1000);
+
+        document.getElementById("status").innerText = `💡 İpucu: ${formatCard(topCard)} → ${targetIndex + 1}. seri`;
+    }
+}
+
+// 🏆 Konfeti Efekti + Ses
+function triggerWinCelebration() {
+    // Konfeti (canvas-confetti kullanılıyorsa)
+    if (window.confetti) {
+        const duration = 3 * 1000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+            });
+            confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        })();
+    }
+
+    // Zafer sesi
+    const audio = document.getElementById("winSound");
+    if (audio) {
+        audio.currentTime = 0;
+        audio.play();
+    }
+
+    // canvas-confetti'nin canvas'ına yüksek z-index ver
+    setTimeout(() => {
+        const c = document.querySelector('canvas');
+        if (c) c.style.zIndex = "3000";
+    }, 50);
+}
+
+function startGameFromModal() {
+    const modal = document.getElementById("settingsModal");
+    if (modal) modal.style.display = "none";
+    createDeck();
+}
+
+function closeSettingsModal() {
+    document.getElementById("settingsModal").style.display = "none";
+}
+
+// Modal dışında tıklanınca da kapanması
+window.addEventListener("click", function (event) {
+    const modal = document.getElementById("settingsModal");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+});
+
+function openSettingsFromWin() {
+    // Önce kazanç modalını kapat
+    const winModal = document.getElementById("winModal");
+    if (winModal) winModal.style.display = "none";
+  
+    // Sonra ayar modalını göster
+    const settingsModal = document.getElementById("settingsModal");
+    if (settingsModal) settingsModal.style.display = "block";
+  }
+
+  function openSettingsFromLoss() {
+    const settingsModal = document.getElementById("settingsModal");
+    if (settingsModal) settingsModal.style.display = "block";
+  }
+
 // Event listeners
 document.getElementById("deck").addEventListener("click", drawThree);
-document.getElementById("resetBtn").addEventListener("click", createDeck);
 document.getElementById("undoBtn").addEventListener("click", undoDraw);
+document.getElementById("resetBtn").addEventListener("click", () => {
+    document.getElementById("settingsModal").style.display = "block";
+});
 
 // Başlangıçta oyunu başlat
 createDeck();

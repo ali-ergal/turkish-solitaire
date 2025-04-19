@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Solitaire Tarzı Kart Oyunu</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -36,9 +37,40 @@
         <div id="remainingCards" style="margin-top: 5px;"></div>
     </div>
 
+    <div id="winModal" style="display: none;">
+        <h2>🏆 Tebrikler!</h2>
+        <p id="winStats"></p>
+        <button onclick="openSettingsFromWin()">🔁 Tekrar Oyna</button>
+    </div>
+
+    <!-- Ayar Modali -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeSettingsModal()">&times;</span>
+          <h2>🎮 Yeni Oyun Ayarları</h2>
+      
+          <label for="difficultySelect">Zorluk Seviyesi:</label>
+          <select id="difficultySelect">
+            <option value="1">🟢 Kolay (1 kart)</option>
+            <option value="2">🟡 Orta (2 kart)</option>
+            <option value="3" selected>🔴 Zor (3 kart)</option>
+          </select>
+      
+          <label style="margin-top: 12px;">
+            <input type="checkbox" id="autoHintToggle">
+            💡 Otomatik İpucu
+          </label>
+      
+          <div style="margin-top: 20px;">
+            <button onclick="startGameFromModal()">✅ Başla</button>
+          </div>
+        </div>
+      </div>
+
 
     <audio id="dropSound" src="sounds/card-drop.mp3" preload="auto"></audio>
     <audio id="newTurnSound" src="sounds/new-turn.mp3" preload="auto"></audio>
+    <audio id="winSound" src="sounds/win.mp3" preload="auto"></audio>
 
     <script src="game.js"></script>
 </body>
