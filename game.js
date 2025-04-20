@@ -7,6 +7,8 @@ let table = [];
 let turdaYerlesenKartSayisi = 0;
 let moveCount = 0;
 let score = 0;
+let comboCount = 0;
+let lastPlaceTime = 0;
 let highScore = Number(localStorage.getItem("highScore")) || 0;
 let startTime;
 let timerInterval;
@@ -20,7 +22,7 @@ let difficultyLevel = 3;
 
 let hintTimeout = null;
 
-let autoHintEnabled = true;
+let autoHintEnabled = Number(localStorage.getItem("autoHint"));
 
 const seriesInfo = [
     { suit: "♥", direction: "asc", label: "As ♥", card_image: "ace_of_hearts.png" },
@@ -79,6 +81,9 @@ function shuffle(array) {
 }
 
 function drawThree() {
+
+    comboCount = 0;
+
     // Eğer deste bitti ve hiç kart yerleştirilememişse: kaybettin
     if (drawIndex >= deck.length) {
         if (turdaYerlesenKartSayisi === 0) {
@@ -101,8 +106,6 @@ function drawThree() {
         const deckEl = document.getElementById("deck");
         deckEl.classList.add("flash");
         setTimeout(() => deckEl.classList.remove("flash"), 500);
-
-        document.getElementById("status").innerText = "🔁 Yeni tura geçildi.";
 
         updateUI();
 
@@ -189,8 +192,10 @@ function placeCardOnSeries(index) {
         turdaYerlesenKartSayisi++;
 
         // ✅ Hamle ve skor güncelle
+        comboCount++;
+        const comboBonus = (comboCount - 1) * 5;
+        score += 10 + comboBonus;
         moveCount++;
-        score += 10;
         updateCounters();
 
         checkSuitCompletion(card.suit);
@@ -338,30 +343,33 @@ function updateUI() {
     drawnDiv.innerHTML = "";
 
     if (drawnCards.length > 0) {
-        const topCard = drawnCards[drawnCards.length - 1];
-        const img = document.createElement("img");
-        img.src = cardImageFile(topCard);
-        img.alt = formatCard(topCard);
-        img.className = "card-img";
-        img.setAttribute("draggable", "true");
+        const drawCount = Math.min(difficultyLevel, drawnCards.length);
+        const start = drawnCards.length - drawCount;
+        const visibleCards = drawnCards.slice(start);
 
-        // 🖱 Tıklama ile seçme (mobil için)
-        img.addEventListener("click", () => {
-            selectedCard = topCard;
-            highlightCard(img);
+        visibleCards.forEach((card, i) => {
+            const img = document.createElement("img");
+            img.src = cardImageFile(card);
+            img.alt = formatCard(card);
+            img.className = "card-img";
+            img.style.zIndex = i + 1;
+
+            if (i === visibleCards.length - 1) {
+                img.setAttribute("draggable", "true");
+                img.addEventListener("click", () => {
+                    selectedCard = card;
+                    highlightCard(img);
+                });
+                img.addEventListener("dragstart", (e) => {
+                    e.dataTransfer.setData("text/plain", JSON.stringify(card));
+                });
+                img.addEventListener("dblclick", () => {
+                    tryAutoPlaceCard(card);
+                });
+            }
+
+            drawnDiv.appendChild(img);
         });
-
-        // 🖱 Sürükle desteği
-        img.addEventListener("dragstart", (e) => {
-            e.dataTransfer.setData("text/plain", JSON.stringify(topCard));
-        });
-
-        // ✅ Double click ile otomatik yerleştir
-        img.addEventListener("dblclick", () => {
-            tryAutoPlaceCard(topCard);
-        });
-
-        drawnDiv.appendChild(img);
     }
 
     // Masadaki seriler (boş kutular, sadece kart varsa görsel)
@@ -554,7 +562,6 @@ function updateTimer() {
 
 function showHint() {
     if (drawnCards.length === 0) {
-        document.getElementById("status").innerText = "🤔 Açık kart yok.";
         return;
     }
 
@@ -568,9 +575,7 @@ function showHint() {
         }
     }
 
-    if (targetIndex === -1) {
-        document.getElementById("status").innerText = "🟨 Bu kartı koyacak yer yok.";
-    } else {
+    if (targetIndex !== -1) {
         const seriesEl = document.querySelectorAll(".series-container")[targetIndex];
         seriesEl.classList.add("hint");
 
@@ -578,7 +583,6 @@ function showHint() {
             seriesEl.classList.remove("hint");
         }, 1000);
 
-        document.getElementById("status").innerText = `💡 İpucu: ${formatCard(topCard)} → ${targetIndex + 1}. seri`;
     }
 }
 
@@ -645,16 +649,16 @@ function openSettingsFromWin() {
     // Önce kazanç modalını kapat
     const winModal = document.getElementById("winModal");
     if (winModal) winModal.style.display = "none";
-  
+
     // Sonra ayar modalını göster
     const settingsModal = document.getElementById("settingsModal");
     if (settingsModal) settingsModal.style.display = "block";
-  }
+}
 
-  function openSettingsFromLoss() {
+function openSettingsFromLoss() {
     const settingsModal = document.getElementById("settingsModal");
     if (settingsModal) settingsModal.style.display = "block";
-  }
+}
 
 // Event listeners
 document.getElementById("deck").addEventListener("click", drawThree);
