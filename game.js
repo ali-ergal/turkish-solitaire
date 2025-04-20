@@ -1,65 +1,39 @@
 const debug = false;
 const suits = ["♠", "♥", "♣", "♦"];
-let deck = [];
-let drawIndex = 0;
-let drawnCards = [];
-let table = [];
-let turdaYerlesenKartSayisi = 0;
-let moveCount = 0;
-let score = 0;
-let comboCount = 0;
-let lastPlaceTime = 0;
-let highScore = Number(localStorage.getItem("highScore")) || 0;
-let startTime;
-let timerInterval;
-
-let selectedCard = null; // mobil seçim için
-
-let completedSuits = []; // ["♥", "♠", ...] buraya ekleyeceğiz
-let lastDrawCount = 0; // en son kaç kart çekildi (1, 2, 3 olabilir)
-let undoEnabled = false;
-let difficultyLevel = 3;
-
-let hintTimeout = null;
-
-let autoHintEnabled = Number(localStorage.getItem("autoHint"));
+let deck = [], drawIndex = 0, drawnCards = [], table = [], turdaYerlesenKartSayisi = 0;
+let moveCount = 0, score = 0, comboCount = 0, lastPlaceTime = 0, highScore = Number(localStorage.getItem("highScore")) || 0;
+let startTime, timerInterval, selectedCard = null, completedSuits = [], lastDrawCount = 0, undoEnabled = false;
+let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint"));
 
 const seriesInfo = [
     { suit: "♥", direction: "asc", label: "As ♥", card_image: "ace_of_hearts.png" },
     { suit: "♣", direction: "asc", label: "As ♣", card_image: "ace_of_spades.png" },
     { suit: "♦", direction: "asc", label: "As ♦", card_image: "ace_of_diamonds.png" },
     { suit: "♠", direction: "asc", label: "As ♠", card_image: "ace_of_clubs.png" },
-
     { suit: "♥", direction: "desc", label: "Papaz ♥", card_image: "king_of_hearts.png" },
     { suit: "♣", direction: "desc", label: "Papaz ♣", card_image: "king_of_spades.png" },
     { suit: "♦", direction: "desc", label: "Papaz ♦", card_image: "ace_of_diamonds.png" },
     { suit: "♠", direction: "desc", label: "Papaz ♠", card_image: "ace_of_clubs.png" },
 ];
 
-if (debug) {
-    document.getElementById("debugPanel").style.display = "block";
-} else {
-    document.getElementById("debugPanel").style.display = "none";
-}
+const toggleDebugPanel = () => {
+    const debugPanel = document.getElementById("debugPanel");
+    debugPanel.style.display = debug ? "block" : "none";
+};
+
+toggleDebugPanel();
 
 function createDeck() {
     const winModal = document.getElementById("winModal");
     if (winModal) winModal.style.display = "none";
     difficultyLevel = Number(document.getElementById("difficultySelect").value);
-    deck = [];
-    completedSuits = [];
-    for (let suit of suits) {
-        for (let rank = 1; rank <= 13; rank++) {
-            deck.push({ suit, rank, faceUp: false });
-        }
-    }
+    deck = suits.flatMap(suit => Array.from({ length: 13 }, (_, rank) => ({ suit, rank: rank + 1, faceUp: false })));
     deck = shuffle(deck);
     drawIndex = 0;
     drawnCards = [];
     table = Array.from({ length: 8 }, () => []);
-
-    moveCount = 0;
-    score = 0;
+    moveCount = score = 0;
+    completedSuits = [];
     updateCounters();
 
     const toggle = document.getElementById("autoHintToggle");
@@ -80,11 +54,58 @@ function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
 }
 
-function drawThree() {
+function updateCounters() {
+    const highScoreDisplay = ` (Rekor: ${highScore})`;
+    document.getElementById("moveCounter").innerText = `Hamle: ${moveCount}`;
+    document.getElementById("scoreCounter").innerText = `Skor: ${score}${highScoreDisplay}`;
+}
 
+function updateTimer() {
+    const diff = Math.floor((Date.now() - startTime) / 1000);
+    const minutes = Math.floor(diff / 60);
+    const seconds = diff % 60;
+    document.getElementById("timer").innerText = `Süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function playSound(id) {
+    const audio = document.getElementById(id);
+    if (audio) {
+        audio.currentTime = 0;
+        audio.play();
+    }
+}
+
+function playDropSound() {
+    playSound("dropSound");
+}
+
+function playNewTurnSound() {
+    playSound("newTurnSound");
+}
+
+function highlightCard(el) {
+    removeHighlight();
+    el.classList.add("selected");
+}
+
+function removeHighlight() {
+    document.querySelectorAll(".card-img.selected").forEach(el => el.classList.remove("selected"));
+}
+
+function cardImageFile(card) {
+    const rankMap = { 1: "ace", 11: "jack", 12: "queen", 13: "king" };
+    const suitMap = { "♠": "spades", "♥": "hearts", "♦": "diamonds", "♣": "clubs" };
+    return `cards/${rankMap[card.rank] || card.rank}_of_${suitMap[card.suit]}.png`;
+}
+
+function formatCard(card) {
+    const names = { 1: "As", 11: "Vale", 12: "Kız", 13: "Papaz" };
+    return `${names[card.rank] || card.rank}${card.suit}`;
+}
+
+function drawThree() {
     comboCount = 0;
 
-    // Eğer deste bitti ve hiç kart yerleştirilememişse: kaybettin
     if (drawIndex >= deck.length) {
         if (turdaYerlesenKartSayisi === 0) {
             document.getElementById("status").innerHTML = `
@@ -94,7 +115,6 @@ function drawThree() {
             return;
         }
 
-        // Yeni tur başlatılıyor
         drawIndex = 0;
         turdaYerlesenKartSayisi = 0;
         drawnCards = [];
@@ -108,18 +128,14 @@ function drawThree() {
         setTimeout(() => deckEl.classList.remove("flash"), 500);
 
         updateUI();
-
-        // ❗Yeni turda kart açma yok
         return;
     }
 
-    // ✅ Kalan kart sayısına göre esnek çekim
     const remaining = deck.length - drawIndex;
     const drawCount = Math.min(difficultyLevel, remaining);
     lastDrawCount = drawCount;
     undoEnabled = true;
 
-    // 🕒 3 saniye sonra otomatik ipucu ver
     if (hintTimeout) clearTimeout(hintTimeout);
 
     if (autoHintEnabled) {
@@ -135,10 +151,9 @@ function drawThree() {
         drawIndex++;
     }
 
-    // Her çekimden sonra otomatik ipucu ver
     setTimeout(() => {
-        showHint(); // 💡 Otomatik ipucu
-    }, 300); // çok hızlı olmaması için kısa bir gecikme
+        showHint();
+    }, 300);
 
     updateUI();
 }
@@ -167,19 +182,17 @@ function placeCardOnSeries(index) {
     const card = drawnCards[drawnCards.length - 1];
 
     if (canPlaceCardOnSeries(index, card)) {
-        playDropSound(); // 🔊 ses burada çalacak
+        playDropSound();
 
-        table[index].push(card); // karti masaya ekle
-        undoEnabled = false; // geri al buttonunu devre disi birak
+        table[index].push(card);
+        undoEnabled = false;
 
-        // ✅ Seri tamamlandıysa +100 puan
         if (table[index].length === 13) {
             score += 100;
             document.getElementById("status").innerText = `🎉 ${index + 1}. seri tamamlandı! +100 puan`;
         }
         drawnCards.pop();
 
-        // 🔥 Remove from deck
         const cardIndexInDeck = deck.findIndex(
             c => c.suit === card.suit && c.rank === card.rank
         );
@@ -188,10 +201,8 @@ function placeCardOnSeries(index) {
             drawIndex--;
         }
 
-        // ✅ TURDA KART KONDU!
         turdaYerlesenKartSayisi++;
 
-        // ✅ Hamle ve skor güncelle
         comboCount++;
         const comboBonus = (comboCount - 1) * 5;
         score += 10 + comboBonus;
@@ -220,19 +231,17 @@ function placeCardOnSeries(index) {
             clearInterval(timerInterval);
             document.getElementById("status").innerText = "";
 
-            // 🃏 Kartları uçur
             document.querySelectorAll(".card-img").forEach((img, i) => {
                 setTimeout(() => {
                     img.classList.add("win-fly");
                 }, i * 50);
             });
 
-            // 🏆 Modal göster
             setTimeout(() => {
                 const modal = document.getElementById("winModal");
                 const winStats = document.getElementById("winStats");
                 winStats.innerText = finalMessage.replaceAll("\n", "\n");
-                triggerWinCelebration(); // 🎊 Konfeti + ses
+                triggerWinCelebration();
                 modal.style.display = "flex";
 
             }, 1000);
@@ -257,13 +266,10 @@ function undoDraw() {
     const deckRect = deckEl.getBoundingClientRect();
     const drawnDiv = document.getElementById("drawnCards");
 
-    // Son çekilen kartları sırayla al
     const cardsToReturn = drawnCards.slice(-lastDrawCount);
 
-    // drawnCards listesinden sil
     drawnCards.splice(-lastDrawCount, lastDrawCount);
 
-    // UI güncellemesi öncesi deck'e tek tek ekleyelim
     cardsToReturn.forEach((card, i) => {
         const img = drawnDiv.querySelector("img");
         const fromRect = img ? img.getBoundingClientRect() : { left: 0, top: 0 };
@@ -285,7 +291,6 @@ function undoDraw() {
         setTimeout(() => {
             card.faceUp = true;
 
-            // ✅ Kopya kontrolü: bu kart zaten deck'te varsa tekrar ekleme!
             const exists = deck.some(c => c.suit === card.suit && c.rank === card.rank);
             if (!exists) {
                 deck.splice(drawIndex - lastDrawCount + i, 0, card);
@@ -306,39 +311,14 @@ function undoDraw() {
     });
 }
 
-function cardImageFile(card) {
-    const rankMap = {
-        1: "ace",
-        11: "jack",
-        12: "queen",
-        13: "king"
-    };
-    const suitMap = {
-        "♠": "spades",
-        "♥": "hearts",
-        "♦": "diamonds",
-        "♣": "clubs"
-    };
-    const rank = rankMap[card.rank] || card.rank;
-    const suit = suitMap[card.suit];
-    return `cards/${rank}_of_${suit}.png`;
-}
-
-function formatCard(card) {
-    const names = { 1: "As", 11: "Vale", 12: "Kız", 13: "Papaz" };
-    return `${names[card.rank] || card.rank}${card.suit}`;
-}
-
 function updateUI() {
-
-    // 🂠 Kapalı deste görselini kontrol et
     const deckEl = document.getElementById("deck");
     if (drawIndex >= deck.length) {
-        deckEl.classList.add("empty"); // resim kalksın
+        deckEl.classList.add("empty");
     } else {
-        deckEl.classList.remove("empty"); // resim gösterilsin
+        deckEl.classList.remove("empty");
     }
-    // Açılan kartlar
+
     const drawnDiv = document.getElementById("drawnCards");
     drawnDiv.innerHTML = "";
 
@@ -372,7 +352,6 @@ function updateUI() {
         });
     }
 
-    // Masadaki seriler (boş kutular, sadece kart varsa görsel)
     const tableDiv = document.getElementById("table");
     tableDiv.innerHTML = "";
 
@@ -380,7 +359,6 @@ function updateUI() {
         const container = document.createElement("div");
         container.className = "series-container";
 
-        // 🎯 Bırakma olayları
         container.ondragover = (e) => e.preventDefault();
         container.ondrop = (e) => {
             e.preventDefault();
@@ -389,13 +367,11 @@ function updateUI() {
         };
 
         container.onclick = () => {
-            // Eğer mobilde kart seçildiyse, buraya yerleştir
             if (selectedCard) {
                 handleDropCard(index, selectedCard);
                 selectedCard = null;
-                removeHighlight(); // seçim vurgusunu kaldır
+                removeHighlight();
             } else {
-                // masa tıklaması (masa kutusuna doğrudan tıklama)
                 placeCardOnSeries(index);
             }
         };
@@ -421,8 +397,6 @@ function updateUI() {
         tableDiv.appendChild(container);
     });
 
-
-    // 🛠 DEBUG: deck'te kalan kartları göster
     if (debug) {
         const remainingDiv = document.getElementById("remainingCards");
         remainingDiv.innerHTML = "";
@@ -437,14 +411,13 @@ function updateUI() {
 
 function handleDropCard(seriesIndex, droppedCard) {
     const top = drawnCards[drawnCards.length - 1];
-    // Yalnızca en üst kart sürüklenebilir, güvenlik kontrolü
     if (!top || top.suit !== droppedCard.suit || top.rank !== droppedCard.rank) {
         document.getElementById("status").innerText = "❌ Bu kart geçersiz.";
         return;
     }
 
     if (canPlaceCardOnSeries(seriesIndex, top)) {
-        playDropSound(); // 🔊 ses burada çalacak
+        playDropSound();
         placeCardOnSeries(seriesIndex);
     } else {
         document.getElementById("status").innerText = "⛔ Bu seriye bu kart konamaz.";
@@ -452,7 +425,6 @@ function handleDropCard(seriesIndex, droppedCard) {
 }
 
 function tryAutoPlaceCard(card) {
-    // 1. Uygun seri bul
     let targetIndex = -1;
     for (let i = 0; i < table.length; i++) {
         if (canPlaceCardOnSeries(i, card)) {
@@ -466,7 +438,6 @@ function tryAutoPlaceCard(card) {
         return;
     }
 
-    // 2. Animasyon başlat (kartı uçur)
     animateCardToSeries(card, targetIndex);
 }
 
@@ -477,7 +448,6 @@ function animateCardToSeries(card, seriesIndex) {
     const rectFrom = cardImg.getBoundingClientRect();
     const rectTo = targetBox.getBoundingClientRect();
 
-    // Uçan kart görseli oluştur
     const flying = document.createElement("img");
     flying.src = cardImageFile(card);
     flying.className = "flying-card";
@@ -485,7 +455,6 @@ function animateCardToSeries(card, seriesIndex) {
     flying.style.top = rectFrom.top + "px";
     document.body.appendChild(flying);
 
-    // Zamanlamalı olarak hedefe uçur
     requestAnimationFrame(() => {
         const dx = rectTo.left - rectFrom.left;
         const dy = rectTo.top - rectFrom.top;
@@ -493,51 +462,15 @@ function animateCardToSeries(card, seriesIndex) {
         flying.style.opacity = "0.7";
     });
 
-    // Kart animasyonla uçuştan sonra yerleştirilsin
     setTimeout(() => {
         placeCardOnSeries(seriesIndex);
         flying.remove();
-    }, 500); // animasyon süresi
-}
-
-function updateCounters() {
-    document.getElementById("moveCounter").innerText = `Hamle: ${moveCount}`;
-    document.getElementById("scoreCounter").innerText = `Skor: ${score}`;
-    const highScoreDisplay = ` (Rekor: ${highScore})`;
-    document.getElementById("scoreCounter").innerText = `Skor: ${score}${highScoreDisplay}`;
-}
-
-function playDropSound() {
-    const audio = document.getElementById("dropSound");
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play();
-    }
-}
-
-function playNewTurnSound() {
-    const audio = document.getElementById("newTurnSound");
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play();
-    }
-}
-
-function highlightCard(el) {
-    removeHighlight();
-    el.classList.add("selected");
-}
-
-function removeHighlight() {
-    document.querySelectorAll(".card-img.selected").forEach(el => {
-        el.classList.remove("selected");
-    });
+    }, 500);
 }
 
 function checkSuitCompletion(suit) {
-    if (completedSuits.includes(suit)) return; // zaten tamamlandıysa geç
+    if (completedSuits.includes(suit)) return;
 
-    // O suit'e ait iki seriyi bul
     const relatedSeriesIndexes = seriesInfo
         .map((s, i) => (s.suit === suit ? i : -1))
         .filter(i => i !== -1);
@@ -550,14 +483,6 @@ function checkSuitCompletion(suit) {
         updateCounters();
         document.getElementById("status").innerText = `🎉 ${suit} serisi tamamlandı! +100 puan`;
     }
-}
-
-function updateTimer() {
-    const now = Date.now();
-    const diff = Math.floor((now - startTime) / 1000);
-    const minutes = Math.floor(diff / 60);
-    const seconds = diff % 60;
-    document.getElementById("timer").innerText = `Süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function showHint() {
@@ -582,13 +507,10 @@ function showHint() {
         setTimeout(() => {
             seriesEl.classList.remove("hint");
         }, 1000);
-
     }
 }
 
-// 🏆 Konfeti Efekti + Ses
 function triggerWinCelebration() {
-    // Konfeti (canvas-confetti kullanılıyorsa)
     if (window.confetti) {
         const duration = 3 * 1000;
         const end = Date.now() + duration;
@@ -613,14 +535,8 @@ function triggerWinCelebration() {
         })();
     }
 
-    // Zafer sesi
-    const audio = document.getElementById("winSound");
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play();
-    }
+    playSound("winSound");
 
-    // canvas-confetti'nin canvas'ına yüksek z-index ver
     setTimeout(() => {
         const c = document.querySelector('canvas');
         if (c) c.style.zIndex = "3000";
@@ -637,7 +553,6 @@ function closeSettingsModal() {
     document.getElementById("settingsModal").style.display = "none";
 }
 
-// Modal dışında tıklanınca da kapanması
 window.addEventListener("click", function (event) {
     const modal = document.getElementById("settingsModal");
     if (event.target === modal) {
@@ -646,11 +561,9 @@ window.addEventListener("click", function (event) {
 });
 
 function openSettingsFromWin() {
-    // Önce kazanç modalını kapat
     const winModal = document.getElementById("winModal");
     if (winModal) winModal.style.display = "none";
 
-    // Sonra ayar modalını göster
     const settingsModal = document.getElementById("settingsModal");
     if (settingsModal) settingsModal.style.display = "block";
 }
@@ -660,12 +573,10 @@ function openSettingsFromLoss() {
     if (settingsModal) settingsModal.style.display = "block";
 }
 
-// Event listeners
 document.getElementById("deck").addEventListener("click", drawThree);
 document.getElementById("undoBtn").addEventListener("click", undoDraw);
 document.getElementById("resetBtn").addEventListener("click", () => {
     document.getElementById("settingsModal").style.display = "block";
 });
 
-// Başlangıçta oyunu başlat
 createDeck();
