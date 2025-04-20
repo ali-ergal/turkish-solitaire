@@ -3,7 +3,7 @@ const suits = ["♠", "♥", "♣", "♦"];
 let deck = [], drawIndex = 0, drawnCards = [], table = [], turdaYerlesenKartSayisi = 0;
 let moveCount = 0, score = 0, comboCount = 0, lastPlaceTime = 0, highScore = Number(localStorage.getItem("highScore")) || 0;
 let startTime, timerInterval, selectedCard = null, completedSuits = [], lastDrawCount = 0, undoEnabled = false;
-let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint"));
+let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint")), jokerUsed = false;
 
 const seriesInfo = [
     { suit: "♥", direction: "asc", label: "As ♥", card_image: "ace_of_hearts.png" },
@@ -158,6 +158,26 @@ function drawThree() {
     updateUI();
 }
 
+function useJoker() {
+    if (jokerUsed) {
+        document.getElementById("status").innerText = "❌ Joker zaten kullanıldı."
+      return;
+    }
+  
+    if (drawIndex >= deck.length) {
+      document.getElementById("status").innerText = "⛔ Joker kullanılacak kart kalmadı.";
+      return;
+    }
+  
+    // Joker mantığı: sıradaki kartı sona taşı
+    const card = deck.splice(drawIndex, 1)[0];
+    deck.push(card);
+  
+    jokerUsed = true;
+    document.getElementById("status").innerText = `🃏 Joker kullanıldı! Kart sona taşındı.`;
+    updateUI();
+}
+
 function canPlaceCardOnSeries(seriesIndex, card) {
     const { suit, direction } = seriesInfo[seriesIndex];
     const pile = table[seriesIndex];
@@ -216,7 +236,7 @@ function placeCardOnSeries(index) {
         if (table.flat().length === 52) {
             score += 500;
             updateCounters();
-            document.getElementById("status").innerText = `🏆 Oyunu kazandınız! Toplam hamle: ${moveCount}, Skor: ${score}`;
+            saveScoreHistory(score, moveCount, duration);
             const duration = Math.floor((Date.now() - startTime) / 1000);
             const minutes = Math.floor(duration / 60);
             const seconds = duration % 60;
@@ -508,6 +528,47 @@ function showHint() {
             seriesEl.classList.remove("hint");
         }, 1000);
     }
+}
+
+function saveScoreHistory(score, moves, duration) {
+    let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
+    history.push({
+        score,
+        moves,
+        duration,
+        date: new Date().toLocaleString()
+    });
+    localStorage.setItem("scoreHistory", JSON.stringify(history));
+}
+
+function showScoreHistory() {
+    const modal = document.getElementById("scoreHistoryModal");
+    const tableDiv = document.getElementById("scoreHistoryTable");
+    const history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
+
+    if (history.length === 0) {
+        tableDiv.innerHTML = "<p>Henüz skor kaydı yok.</p>";
+    } else {
+        let html = "<table><tr><th>Skor</th><th>Hamle</th><th>Süre</th><th>Tarih</th></tr>";
+        for (let h of history.reverse()) {
+            const minutes = Math.floor(h.duration / 60);
+            const seconds = h.duration % 60;
+            html += `<tr><td>${h.score}</td><td>${h.moves}</td><td>${minutes}:${seconds.toString().padStart(2, '0')}</td><td>${h.date}</td></tr>`;
+        }
+        html += "</table>";
+        tableDiv.innerHTML = html;
+    }
+
+    modal.style.display = "block";
+}
+
+function closeScoreHistory() {
+    document.getElementById("scoreHistoryModal").style.display = "none";
+}
+
+function clearScoreHistory() {
+    localStorage.removeItem("scoreHistory");
+    showScoreHistory();
 }
 
 function triggerWinCelebration() {

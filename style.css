@@ -373,6 +373,19 @@ body {
   transform: scale(1.05);
 }
 
+#scoreHistoryTable table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#scoreHistoryTable th, #scoreHistoryTable td {
+  padding: 8px;
+  border: 1px solid #666;
+  text-align: center;
+  font-size: 14px;
+}
+
 /* 🎛️ Ayarlar Modal */
 .modal {
   display: none;
@@ -412,6 +425,10 @@ body {
   border-radius: 6px;
   color: white;
   cursor: pointer;
+}
+
+.modal-content .autoHintWrapper{
+  margin-top:20px
 }
 
 .modal-content .close {

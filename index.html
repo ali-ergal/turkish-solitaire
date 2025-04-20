@@ -12,6 +12,7 @@
 <body>
     <div class="menu-bar">
         <button id="resetBtn">🔄 Yeni Oyun</button>
+        <button onclick="showScoreHistory()">📊 Skor Geçmişi</button>
     </div>
 
     <div class="game-area">
@@ -25,6 +26,10 @@
 
     <div class="undo-wrapper">
         <button id="undoBtn">↩️ Geri Al</button>
+    </div>
+
+    <div class="jokerWrapper">
+        <button onclick="useJoker()">🃏 Joker Kullan</button>
     </div>
 
     <div id="status" class="status"></div>
@@ -50,24 +55,33 @@
         <div class="modal-content">
             <span class="close" onclick="closeSettingsModal()">&times;</span>
             <h2>🎮 Yeni Oyun Ayarları</h2>
-
-            <label for="difficultySelect">Zorluk Seviyesi:</label>
-            <select id="difficultySelect">
-                <option value="1">🟢 Kolay (1 kart)</option>
-                <option value="2">🟡 Orta (2 kart)</option>
-                <option value="3" selected>🔴 Zor (3 kart)</option>
-            </select>
-
-            <label style="margin-top: 12px;">
-                <input type="checkbox" id="autoHintToggle">
-                💡 Otomatik İpucu
-            </label>
-
+            <div class="difficultyWrapper">
+                <select id="difficultySelect">
+                    <option value="1">🟢 Kolay (1 kart)</option>
+                    <option value="2">🟡 Orta (2 kart)</option>
+                    <option value="3" selected>🔴 Zor (3 kart)</option>
+                </select>
+            </div>
+            <div class="autoHintWrapper">
+                <label>
+                    <input type="checkbox" id="autoHintToggle">
+                    💡 Otomatik İpucu
+                </label>
+            </div>
             <div style="margin-top: 20px;">
                 <button onclick="startGameFromModal()">✅ Başla</button>
             </div>
         </div>
     </div>
+
+    <div id="scoreHistoryModal" class="modal">
+        <div class="modal-content">
+          <span class="close" onclick="closeScoreHistory()">&times;</span>
+          <h2>📊 Skor Geçmişi</h2>
+          <div id="scoreHistoryTable"></div>
+          <button onclick="clearScoreHistory()">🗑 Temizle</button>
+        </div>
+      </div>
 
     <audio id="dropSound" src="sounds/card-drop.mp3" preload="auto"></audio>
     <audio id="newTurnSound" src="sounds/new-turn.mp3" preload="auto"></audio>
