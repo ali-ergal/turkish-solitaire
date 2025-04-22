@@ -107,7 +107,8 @@ function drawThree() {
     comboCount = 0;
 
     if (drawIndex >= deck.length) {
-        if (turdaYerlesenKartSayisi === 0) {
+        if (turdaYerlesenKartSayisi === 0 && jokerUsed === true) {
+            saveScoreHistory(score, moveCount);
             document.getElementById("status").innerHTML = `
               💀 Oyun bitti! Hiç kart yerleştiremedin.
               <br><button onclick="openSettingsFromLoss()">🔁 Tekrar Dene</button>
@@ -142,6 +143,10 @@ function drawThree() {
         hintTimeout = setTimeout(() => {
             showHint();
         }, 3000);
+    
+        setTimeout(() => {
+            showHint();
+        }, 300);
     }
 
     for (let i = 0; i < drawCount; i++) {
@@ -150,10 +155,6 @@ function drawThree() {
         drawnCards.push(card);
         drawIndex++;
     }
-
-    setTimeout(() => {
-        showHint();
-    }, 300);
 
     updateUI();
 }
@@ -236,10 +237,10 @@ function placeCardOnSeries(index) {
         if (table.flat().length === 52) {
             score += 500;
             updateCounters();
-            saveScoreHistory(score, moveCount, duration);
             const duration = Math.floor((Date.now() - startTime) / 1000);
             const minutes = Math.floor(duration / 60);
             const seconds = duration % 60;
+            saveScoreHistory(score, moveCount);
             let finalMessage = `🏆 Oyunu kazandınız!\nHamle: ${moveCount}, Skor: ${score}, Süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
 
             if (score > highScore) {
@@ -530,12 +531,11 @@ function showHint() {
     }
 }
 
-function saveScoreHistory(score, moves, duration) {
+function saveScoreHistory(score, moves) {
     let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
     history.push({
         score,
         moves,
-        duration,
         date: new Date().toLocaleString()
     });
     localStorage.setItem("scoreHistory", JSON.stringify(history));
@@ -549,11 +549,9 @@ function showScoreHistory() {
     if (history.length === 0) {
         tableDiv.innerHTML = "<p>Henüz skor kaydı yok.</p>";
     } else {
-        let html = "<table><tr><th>Skor</th><th>Hamle</th><th>Süre</th><th>Tarih</th></tr>";
+        let html = "<table><tr><th>Skor</th><th>Hamle</th><th>Tarih</th></tr>";
         for (let h of history.reverse()) {
-            const minutes = Math.floor(h.duration / 60);
-            const seconds = h.duration % 60;
-            html += `<tr><td>${h.score}</td><td>${h.moves}</td><td>${minutes}:${seconds.toString().padStart(2, '0')}</td><td>${h.date}</td></tr>`;
+            html += `<tr><td>${h.score}</td><td>${h.moves}</td><td>${h.date}</td></tr>`;
         }
         html += "</table>";
         tableDiv.innerHTML = html;
@@ -604,7 +602,19 @@ function triggerWinCelebration() {
     }, 50);
 }
 
+function openSettingsModal() {
+    document.getElementById("mainMenu").style.display = "none";
+    document.getElementById("settingsModal").style.display = "block";
+  }
+  
+  function backToMainMenu() {
+    document.getElementById("mainMenu").style.display = "flex";
+    document.getElementById("gameArea").style.display = "none";
+    document.getElementById("settingsModal").style.display = "none";
+  }
+
 function startGameFromModal() {
+    document.getElementById("gameArea").style.display = "flex";
     const modal = document.getElementById("settingsModal");
     if (modal) modal.style.display = "none";
     createDeck();

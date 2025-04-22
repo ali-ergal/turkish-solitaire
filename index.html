@@ -10,12 +10,19 @@
 </head>
 
 <body>
+    <div id="mainMenu" class="menu-screen">
+        <h1>🃏 8 Serili</h1>
+        <button onclick="openSettingsModal()">🎮 Yeni Oyun</button>
+        <button onclick="showScoreHistory()">📊 Skor Geçmişi</button>
+        <button onclick="openHelp()">❓ Yardım</button>
+      </div>
+
     <div class="menu-bar">
         <button id="resetBtn">🔄 Yeni Oyun</button>
         <button onclick="showScoreHistory()">📊 Skor Geçmişi</button>
     </div>
 
-    <div class="game-area">
+    <div class="game-area" id="gameArea">
         <div class="left-side">
             <div id="deck" class="deck" title="Kart çekmek için tıkla"></div>
             <div id="drawnCards" class="drawn-area"></div>
