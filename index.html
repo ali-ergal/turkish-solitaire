@@ -17,38 +17,44 @@
         <button onclick="openHelp()">❓ Yardım</button>
       </div>
 
-    <div class="menu-bar">
-        <button id="resetBtn">🔄</button>
-    </div>
+    
 
-    <div class="game-area" id="gameArea">
+    <div class="game-area" id="gameArea" style="display: none;">
+        <div class="menu-bar">
+            <button id="resetBtn">🔄</button>
+        </div>
+        
+
+        <div id="table" class="table-area"></div>
+
         <div class="left-side" id="leftSide" style="display: none;">
             <div id="deck" class="deck" title="Kart çekmek için tıkla"></div>
             <div id="drawnCards" class="drawn-area"></div>
         </div>
 
-        <div id="table" class="table-area"></div>
-    </div>
+        <div class="controls">
+            <div class="undo-wrapper" id="undoWrapper" style="display: none;">
+                <button id="undoBtn">↩️</button>
+            </div>
+        
+            <div class="jokerWrapper" id="jokerWrapper" style="display: none;">
+                <button onclick="useJoker()">🃏</button>
+            </div>
+        </div>
+        
+    
+        <div id="status" class="status"></div>
 
-    <div class="undo-wrapper" id="undoWrapper" style="display: none;">
-        <button id="undoBtn">↩️</button>
+        <div id="counters" class="counters" style="display: none;">
+            <span id="moveCounter">Hamle: 0</span> |
+            <span id="scoreCounter">Skor: 0</span> |
+            <span id="timer">Süre: 0:00</span>
+        </div>
     </div>
-
-    <div class="jokerWrapper" id="jokerWrapper" style="display: none;">
-        <button onclick="useJoker()">🃏</button>
-    </div>
-
-    <div id="status" class="status"></div>
 
     <div id="debugPanel" style="margin-top: 20px; font-family: monospace; color: #ccc;">
         <strong>Kalan Kartlar (deck):</strong>
         <div id="remainingCards" style="margin-top: 5px;"></div>
-    </div>
-
-    <div id="counters" class="counters" style="display: none;">
-        <span id="moveCounter">Hamle: 0</span> |
-        <span id="scoreCounter">Skor: 0</span> |
-        <span id="timer">Süre: 0:00</span>
     </div>
 
     <div id="winModal" style="display: none;">

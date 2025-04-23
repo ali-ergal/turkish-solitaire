@@ -105,7 +105,7 @@ function formatCard(card) {
 
 function drawThree() {
     comboCount = 0;
-
+    document.getElementById("status").innerText = "";
     if (drawIndex >= deck.length) {
         if (turdaYerlesenKartSayisi === 0 && jokerUsed === true) {
             saveScoreHistory(score, moveCount);
@@ -127,6 +127,7 @@ function drawThree() {
         const deckEl = document.getElementById("deck");
         deckEl.classList.add("flash");
         setTimeout(() => deckEl.classList.remove("flash"), 500);
+        
 
         updateUI();
         return;
@@ -621,7 +622,7 @@ function startGameFromModal() {
     document.getElementById("undoWrapper").style.display = "flex";
     document.getElementById("jokerWrapper").style.display = "flex";
     document.getElementById("counters").style.display = "block";
-    document.getElementById("gameArea").style.display = "flex";
+    document.getElementById("gameArea").style.display = "block";
     const modal = document.getElementById("settingsModal");
     if (modal) modal.style.display = "none";
     createDeck();
