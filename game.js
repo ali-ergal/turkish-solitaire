@@ -610,10 +610,17 @@ function openSettingsModal() {
   function backToMainMenu() {
     document.getElementById("mainMenu").style.display = "flex";
     document.getElementById("gameArea").style.display = "none";
+    document.getElementById("undoWrapper").style.display = "none";
+    document.getElementById("jokerWrapper").style.display = "none";
+    document.getElementById("counters").style.display = "none";
     document.getElementById("settingsModal").style.display = "none";
   }
 
 function startGameFromModal() {
+    document.getElementById("leftSide").style.display = "flex";
+    document.getElementById("undoWrapper").style.display = "flex";
+    document.getElementById("jokerWrapper").style.display = "flex";
+    document.getElementById("counters").style.display = "block";
     document.getElementById("gameArea").style.display = "flex";
     const modal = document.getElementById("settingsModal");
     if (modal) modal.style.display = "none";

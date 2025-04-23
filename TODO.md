@@ -1,0 +1,8 @@
+- Joker will cost 20 in-game coins
+- User can use joker as many times as they want
+- After each win the user will earn 10 in-game coin
+- Add an option to change the theme
+- Add an option to turn off the music
+- Make the mobile UI better
+- Make the mobile animations better
+- Add help centre

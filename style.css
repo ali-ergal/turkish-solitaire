@@ -52,21 +52,17 @@ body {
 .menu-bar {
     width: 100%;
     display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
+    justify-content: right;
+    margin-bottom: 20px;
   }
   
   /* Yeni oyun butonu menüde */
   .menu-bar button {
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(135deg, #28a745, #218838);
+    font-size: 30px;
+    background: transparent;
     border: none;
-    border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: none;
     transition: transform 0.2s, box-shadow 0.2s;
   }
   
@@ -104,6 +100,10 @@ body {
   #undoBtn:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  .jokerWrapper{
+    margin-top:20px;
   }
 
   .game-area {
@@ -276,35 +276,7 @@ body {
     border-color: yellow;
 }
 
-@media (max-width: 768px) {
-    .game-area {
-      flex-direction: column-reverse;
-      align-items: center;
-      gap: 20px;
-    }
-  
-    .left-side {
-      justify-content: center;
-      margin-left: 0;
-      margin-top: 10px;
-    }
-  
-    .card-img {
-      width: 80px !important;
-      height: 120px !important;
-    }
-  
-    .series-container {
-      width: 80px !important;
-      height: 120px !important;
-    }
-  
-    .deck,
-    .drawn-area {
-      width: 80px !important;
-      height: 120px !important;
-    }
-  }
+
 
   /* 🃏 Kart Yerleştirme - Hafif parlayan animasyon */
 @keyframes cardDropFlash {
@@ -524,4 +496,69 @@ button:active {
   left: 30px;
   z-index: 3;
   opacity: 1; 
+}
+
+@media (max-width: 768px) {
+  .game-area {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .left-side {
+    justify-content: center;
+    margin-left: 0;
+    position: fixed;
+    bottom: 65px;
+    right: 65px;  
+  }
+
+  .card-img {
+    width: 80px !important;
+    height: 120px !important;
+  }
+
+  .series-container {
+    width: 80px !important;
+    height: 120px !important;
+  }
+
+  .deck,
+  .drawn-area {
+    width: 80px !important;
+    height: 120px !important;
+  }
+
+  .undo-wrapper{
+    position: fixed;
+    bottom: 221px;
+    right: 38px;
+  }
+
+  #undoBtn{
+    padding: 0;
+    font-size: 30px;
+    font-weight: bold;
+    color: black;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .jokerWrapper{
+    margin: 0;
+    position: fixed;
+    bottom: 270px;
+    right: 33px;
+  }
+
+  .jokerWrapper button {
+    background: transparent;
+    box-shadow: none;
+    font-size: 41px;
+    padding: 0;
+  }
 }
