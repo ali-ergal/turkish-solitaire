@@ -243,7 +243,7 @@ function placeCardOnSeries(index) {
             const minutes = Math.floor(duration / 60);
             const seconds = duration % 60;
             saveScoreHistory(score, moveCount);
-            let finalMessage = `🏆 Oyunu kazandınız!\nHamle: ${moveCount}, Skor: ${score}, Süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            let finalMessage = `Oyunu kazandınız!\nHamle: ${moveCount}, Skor: ${score}, Süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
 
             if (score > highScore) {
                 localStorage.setItem("highScore", score);

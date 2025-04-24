@@ -349,6 +349,7 @@ body {
   top: 0;
   left: 0;
   width: 100%;
+  max-width: 400px;
   height: 100%;
   background: rgba(0, 0, 0, 0.85);
   display: flex;
