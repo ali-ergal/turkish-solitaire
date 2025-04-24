@@ -359,7 +359,6 @@ body {
   color: white;
   font-size: 24px;
   text-align: center;
-  padding: 20px;
   flex-direction: column;
   display: none; /* başlangıçta gizli */
 }
@@ -434,6 +433,7 @@ button:active {
 .modal {
   display: none;
   position: fixed;
+  align-items: center;
   z-index: 4000;
   left: 0;
   top: 0;

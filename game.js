@@ -606,7 +606,7 @@ function triggerWinCelebration() {
 
 function openSettingsModal() {
     document.getElementById("mainMenu").style.display = "none";
-    document.getElementById("settingsModal").style.display = "block";
+    document.getElementById("settingsModal").style.display = "flex";
   }
   
   function backToMainMenu() {
@@ -629,34 +629,23 @@ function startGameFromModal() {
     createDeck();
 }
 
-function closeSettingsModal() {
-    document.getElementById("settingsModal").style.display = "none";
-}
-
-window.addEventListener("click", function (event) {
-    const modal = document.getElementById("settingsModal");
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-});
-
 function openSettingsFromWin() {
     const winModal = document.getElementById("winModal");
     if (winModal) winModal.style.display = "none";
 
     const settingsModal = document.getElementById("settingsModal");
-    if (settingsModal) settingsModal.style.display = "block";
+    if (settingsModal) settingsModal.style.display = "flex";
 }
 
 function openSettingsFromLoss() {
     const settingsModal = document.getElementById("settingsModal");
-    if (settingsModal) settingsModal.style.display = "block";
+    if (settingsModal) settingsModal.style.display = "flex";
 }
 
 document.getElementById("deck").addEventListener("click", drawThree);
 document.getElementById("undoBtn").addEventListener("click", undoDraw);
 document.getElementById("resetBtn").addEventListener("click", () => {
-    document.getElementById("settingsModal").style.display = "block";
+    document.getElementById("settingsModal").style.display = "flex";
 });
 
 createDeck();
