@@ -34,6 +34,7 @@ function createDeck() {
     table = Array.from({ length: 8 }, () => []);
     moveCount = score = 0;
     completedSuits = [];
+    jokerUsed = false;
     updateCounters();
 
     const toggle = document.getElementById("autoHintToggle");
@@ -618,11 +619,11 @@ function openSettingsModal() {
   }
 
 function startGameFromModal() {
-    document.getElementById("leftSide").style.display = "flex";
+    document.getElementById("deckArea").style.display = "flex";
     document.getElementById("undoWrapper").style.display = "flex";
     document.getElementById("jokerWrapper").style.display = "flex";
     document.getElementById("counters").style.display = "block";
-    document.getElementById("gameArea").style.display = "block";
+    document.getElementById("gameArea").style.display = "flex";
     const modal = document.getElementById("settingsModal");
     if (modal) modal.style.display = "none";
     createDeck();
