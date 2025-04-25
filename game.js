@@ -43,8 +43,9 @@ function createDeck() {
         autoHintEnabled = toggle.checked;
         localStorage.setItem("autoHint", autoHintEnabled ? "1" : "0");
     }
-
+    
     updateUI();
+    renderDeckStack();
     startTime = Date.now();
     clearInterval(timerInterval);
     timerInterval = setInterval(updateTimer, 1000);
@@ -159,6 +160,31 @@ function drawThree() {
 
     // Now show drawn cards with animation
     updateDrawnCardsAnimated(drawAnimations);
+
+    renderDeckStack();
+}
+
+function renderDeckStack() {
+    const deckEl = document.getElementById("deck");
+    deckEl.innerHTML = ""; // Clear existing stack
+
+    const visibleCount = Math.min(deck.length - drawIndex, 5); // Max 5 cards visible in stack
+
+    for (let i = 0; i < visibleCount; i++) {
+        const img = document.createElement("img");
+        img.src = "cards/back.png"; // back side of the card
+        img.className = "deck-card";
+        img.style.position = "absolute";
+        img.style.right = `${i * 2}px`; // Slight horizontal offset
+        img.style.zIndex = i;
+        deckEl.appendChild(img);
+    }
+
+    if (visibleCount === 0) {
+        deckEl.classList.add("empty");
+    } else {
+        deckEl.classList.remove("empty");
+    }
 }
 
 function updateDrawnCardsAnimated(cards) {
@@ -395,13 +421,13 @@ function undoDraw() {
         flying.style.position = "fixed";
         flying.style.left = fromRect.left + "px";
         flying.style.top = fromRect.top + "px";
-        flying.style.width = "100px";
-        flying.style.height = "140px";
+        flying.style.width = "80px";
+        flying.style.height = "120px";
         flying.style.zIndex = 100 + i;
         document.body.appendChild(flying);
 
-        const dx = (deckRect.left + deckRect.width / 2 - 50) - fromRect.left;
-        const dy = (deckRect.top + deckRect.height / 2 - 70) - fromRect.top;
+        const dx = (deckRect.left + deckRect.width / 2 - 35) - fromRect.left;
+        const dy = (deckRect.top + deckRect.height / 2 - 55) - fromRect.top;
 
         anime({
             targets: flying,

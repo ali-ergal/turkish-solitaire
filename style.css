@@ -151,6 +151,20 @@ body {
     transition: opacity 0.3s ease;
 }
 
+#deck {
+  position: relative;
+  width: 120px;
+  height: 175px;
+}
+
+#deck img.deck-card {
+  width: 120px;
+  height: 175px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease;
+}
+
 .drawn-area {
     width: 120px;
     height: 175px;
@@ -532,6 +546,20 @@ button:active {
   .drawn-area {
     width: 80px !important;
     height: 120px !important;
+  }
+
+  #deck {
+    position: relative;
+    width: 80px;
+    height: 120px;
+  }
+  
+  #deck img.deck-card {
+    width: 80px;
+    height: 120px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    transition: transform 0.2s ease;
   }
 
   .undo-wrapper{
