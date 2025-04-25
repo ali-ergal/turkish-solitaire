@@ -201,13 +201,7 @@ body {
 }
 
 .flying-card {
-    position: fixed;
-    width: 120px;
     background-color: #fff;
-    height: auto;
-    pointer-events: none;
-    transition: transform 0.4s ease, opacity 0.4s ease;
-    z-index: 1000;
 }
 
 .table-area {

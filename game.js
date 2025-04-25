@@ -35,6 +35,7 @@ function createDeck() {
     moveCount = score = 0;
     completedSuits = [];
     jokerUsed = false;
+    document.getElementById("useJoker").disabled = false;
     updateCounters();
 
     const toggle = document.getElementById("autoHintToggle");
@@ -109,6 +110,7 @@ function formatCard(card) {
 function drawThree() {
     comboCount = 0;
     document.getElementById("status").innerText = "";
+
     if (drawIndex >= deck.length) {
         if (turdaYerlesenKartSayisi === 0 && jokerUsed === true) {
             document.getElementById("status").innerHTML = `
@@ -123,14 +125,8 @@ function drawThree() {
         drawnCards = [];
         selectedCard = null;
         removeHighlight();
-
         playNewTurnSound();
-
-        const deckEl = document.getElementById("deck");
-        deckEl.classList.add("flash");
-        setTimeout(() => deckEl.classList.remove("flash"), 500);
-        
-
+        flashDeck();
         updateUI();
         return;
     }
@@ -148,14 +144,108 @@ function drawThree() {
         }, 3000);
     }
 
+    // Instead of drawing all at once, we'll animate them one by one!
+    let drawAnimations = [];
+
     for (let i = 0; i < drawCount; i++) {
-        let card = deck[drawIndex];
+        const card = deck[drawIndex];
         card.faceUp = true;
         drawnCards.push(card);
         drawIndex++;
+
+        // We'll delay UI update slightly
+        drawAnimations.push(card);
     }
 
-    updateUI();
+    // Now show drawn cards with animation
+    updateDrawnCardsAnimated(drawAnimations);
+}
+
+function updateDrawnCardsAnimated(cards) {
+    const drawnDiv = document.getElementById("drawnCards");
+    const deckEl = document.getElementById("deck");
+    const deckRect = deckEl.getBoundingClientRect();
+    const drawnRect = drawnDiv.getBoundingClientRect();
+
+    const oldCards = [...drawnDiv.querySelectorAll("img")]; // Keep old cards
+    const newFlyingCards = [];
+    let animationsCompleted = 0;
+
+    cards.forEach((card, i) => {
+        const img = document.createElement("img");
+        img.src = cardImageFile(card);
+        img.alt = formatCard(card);
+        img.className = "card-img";
+        img.style.opacity = "0";
+        img.style.position = "fixed";
+        img.style.left = (deckRect.left + deckRect.width / 2 - 15) + "px";
+        img.style.top = (deckRect.top + deckRect.height / 2 - 30) + "px";
+        img.style.width = "100px";
+        img.style.zIndex = 100 + i;
+        document.body.appendChild(img);
+
+        const finalLeft = drawnRect.left + (i === 0 ? 0 : i === 1 ? 15 : 30);
+        const finalTop = drawnRect.top;
+
+        anime({
+            targets: img,
+            translateX: finalLeft - parseFloat(img.style.left),
+            translateY: finalTop - parseFloat(img.style.top),
+            opacity: 1,
+            duration: 500,
+            delay: i * 150,
+            easing: "easeOutExpo",
+            complete: () => {
+                newFlyingCards.push({ img, card });
+
+                animationsCompleted++;
+
+                // ✅ Wait until all cards are done flying
+                if (animationsCompleted === cards.length) {
+                    // Step 1: Remove old drawn cards
+                    oldCards.forEach(old => old.remove());
+
+                    // Step 2: Clean up the drawnDiv
+                    drawnDiv.innerHTML = "";
+
+                    // Step 3: Append new cards properly
+                    newFlyingCards.forEach((item, idx) => {
+                        const { img, card } = item;
+
+                        img.style.position = "absolute";
+                        img.style.left = ""; 
+                        img.style.top = "";
+                        img.style.transform = "none";
+                        img.style.opacity = "1";
+                        img.style.zIndex = "";
+
+                        drawnDiv.appendChild(img);
+
+                        // Set proper stacking (30px / 15px layout)
+                        if (idx === 0) {
+                            img.style.left = "0px";
+                        } else if (idx === 1) {
+                            img.style.left = "15px";
+                        } else if (idx === 2) {
+                            img.style.left = "30px";
+                        }
+
+                        img.setAttribute("draggable", "true");
+                        img.addEventListener("click", () => {
+                            selectedCard = card;
+                            highlightCard(img);
+                        });
+                        img.addEventListener("dragstart", (e) => {
+                            e.dataTransfer.setData("text/plain", JSON.stringify(card));
+                        });
+                        img.addEventListener("dblclick", () => {
+                            tryAutoPlaceCard(card);
+                        });
+                    });
+                }
+            }
+        });
+    });
 }
 
 function useJoker() {
@@ -288,47 +378,71 @@ function undoDraw() {
     const drawnDiv = document.getElementById("drawnCards");
 
     const cardsToReturn = drawnCards.slice(-lastDrawCount);
-
     drawnCards.splice(-lastDrawCount, lastDrawCount);
 
+    const existingCards = [...drawnDiv.querySelectorAll("img")];
+    const flyingBackCards = [];
+
+    let animationsCompleted = 0;
+
     cardsToReturn.forEach((card, i) => {
-        const img = drawnDiv.querySelector("img");
-        const fromRect = img ? img.getBoundingClientRect() : { left: 0, top: 0 };
+        const img = existingCards[i];
+        const fromRect = img.getBoundingClientRect();
 
         const flying = document.createElement("img");
         flying.src = cardImageFile(card);
         flying.className = "flying-card";
-        flying.style.left = `${fromRect.left}px`;
-        flying.style.top = `${fromRect.top}px`;
+        flying.style.position = "fixed";
+        flying.style.left = fromRect.left + "px";
+        flying.style.top = fromRect.top + "px";
+        flying.style.width = "100px";
+        flying.style.height = "140px";
+        flying.style.zIndex = 100 + i;
         document.body.appendChild(flying);
 
-        requestAnimationFrame(() => {
-            const dx = deckRect.left - fromRect.left;
-            const dy = deckRect.top - fromRect.top;
-            flying.style.transform = `translate(${dx}px, ${dy}px)`;
-            flying.style.opacity = "0.5";
+        const dx = (deckRect.left + deckRect.width / 2 - 50) - fromRect.left;
+        const dy = (deckRect.top + deckRect.height / 2 - 70) - fromRect.top;
+
+        anime({
+            targets: flying,
+            translateX: dx,
+            translateY: dy,
+            opacity: 0.5,
+            duration: 500,
+            delay: i * 150,
+            easing: "easeOutExpo",
+            complete: () => {
+                flyingBackCards.push(flying);
+                animationsCompleted++;
+
+                // ✅ When all cards are back to deck
+                if (animationsCompleted === cardsToReturn.length) {
+                    flyingBackCards.forEach(card => card.remove());
+
+                    // Clean up drawn area
+                    drawnDiv.innerHTML = "";
+
+                    drawIndex -= lastDrawCount;
+                    updateUI();
+
+                    document.getElementById("status").innerText = "↩️ Açılan kartlar geri alındı.";
+                    lastDrawCount = 0;
+                    undoEnabled = false;
+                    selectedCard = null;
+                    removeHighlight();
+                }
+            }
         });
+    });
+}
 
-        setTimeout(() => {
-            card.faceUp = true;
-
-            const exists = deck.some(c => c.suit === card.suit && c.rank === card.rank);
-            if (!exists) {
-                deck.splice(drawIndex - lastDrawCount + i, 0, card);
-            }
-
-            flying.remove();
-
-            if (i === cardsToReturn.length - 1) {
-                drawIndex -= lastDrawCount;
-                updateUI();
-                document.getElementById("status").innerText = "↩️ Açılan kartlar geri alındı.";
-                lastDrawCount = 0;
-                undoEnabled = false;
-                selectedCard = null;
-                removeHighlight();
-            }
-        }, 500 + i * 100);
+function flashDeck() {
+    anime({
+        targets: "#deck",
+        scale: [1, 1.2],
+        direction: "alternate",
+        duration: 200,
+        easing: "easeInOutQuad"
     });
 }
 
@@ -472,21 +586,30 @@ function animateCardToSeries(card, seriesIndex) {
     const flying = document.createElement("img");
     flying.src = cardImageFile(card);
     flying.className = "flying-card";
+    flying.style.position = "fixed";
     flying.style.left = rectFrom.left + "px";
     flying.style.top = rectFrom.top + "px";
+    flying.style.width = cardImg.offsetWidth + "px";
+    flying.style.height = cardImg.offsetHeight + "px";
+    flying.style.zIndex = "1000";
     document.body.appendChild(flying);
 
-    requestAnimationFrame(() => {
-        const dx = rectTo.left - rectFrom.left;
-        const dy = rectTo.top - rectFrom.top;
-        flying.style.transform = `translate(${dx}px, ${dy}px)`;
-        flying.style.opacity = "0.7";
-    });
+    const dx = (rectTo.left + rectTo.width/2) - (rectFrom.left + rectFrom.width/2);
+    const dy = (rectTo.top + rectTo.height/2) - (rectFrom.top + rectFrom.height/2);
 
-    setTimeout(() => {
-        placeCardOnSeries(seriesIndex);
-        flying.remove();
-    }, 500);
+    anime({
+        targets: flying,
+        translateX: dx,
+        translateY: dy,
+        scale: 0.8,
+        opacity: 0.7,
+        duration: 600,
+        easing: "easeOutQuad",
+        complete: () => {
+            flying.remove();
+            placeCardOnSeries(seriesIndex);
+        }
+    });
 }
 
 function checkSuitCompletion(suit) {
@@ -507,9 +630,7 @@ function checkSuitCompletion(suit) {
 }
 
 function showHint() {
-    if (drawnCards.length === 0) {
-        return;
-    }
+    if (drawnCards.length === 0) return;
 
     const topCard = drawnCards[drawnCards.length - 1];
     let targetIndex = -1;
@@ -523,11 +644,16 @@ function showHint() {
 
     if (targetIndex !== -1) {
         const seriesEl = document.querySelectorAll(".series-container")[targetIndex];
-        seriesEl.classList.add("hint");
-
-        setTimeout(() => {
-            seriesEl.classList.remove("hint");
-        }, 1000);
+        anime({
+            targets: seriesEl,
+            boxShadow: [
+                "0 0 0px rgba(255, 255, 0, 0)",
+                "0 0 20px 5px gold",
+                "0 0 0px rgba(255, 255, 0, 0)"
+            ],
+            duration: 1000,
+            easing: "easeInOutQuad"
+        });
     }
 }
 
@@ -607,18 +733,8 @@ function triggerWinCelebration() {
         const end = Date.now() + duration;
 
         (function frame() {
-            confetti({
-                particleCount: 5,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0 },
-            });
-            confetti({
-                particleCount: 5,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1 },
-            });
+            confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+            confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
 
             if (Date.now() < end) {
                 requestAnimationFrame(frame);
@@ -628,10 +744,27 @@ function triggerWinCelebration() {
 
     playSound("winSound");
 
+    const cards = document.querySelectorAll(".card-img");
+    cards.forEach((img, i) => {
+        anime({
+            targets: img,
+            translateY: -600,
+            rotate: 720,
+            opacity: 0,
+            duration: 1000,
+            delay: i * 50,
+            easing: "easeInQuad"
+        });
+    });
+
     setTimeout(() => {
-        const c = document.querySelector('canvas');
-        if (c) c.style.zIndex = "3000";
-    }, 50);
+        const modal = document.getElementById("winModal");
+        const winStats = document.getElementById("winStats");
+        if (modal && winStats) {
+            winStats.innerText = `🏆 Kazandınız! Skor: ${score}`;
+            modal.style.display = "flex";
+        }
+    }, 1500);
 }
 
 function openSettingsModal() {
