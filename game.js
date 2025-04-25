@@ -551,28 +551,32 @@ function showScoreHistory() {
     if (history.length === 0) {
         tableDiv.innerHTML = "<p>Henüz skor kaydı yok.</p>";
     } else {
-        // Önce sıralama: yüksek skor > düşük süre
+        // Önce sıralama
         history.sort((a, b) => {
             if (b.score !== a.score) {
-                return b.score - a.score; // skora göre azalan
+                return b.score - a.score; // Skora göre azalan
             } else {
-                return a.duration - b.duration; // skoru eşitse süreye göre artan
+                return a.duration - b.duration; // Süreye göre artan
             }
         });
 
-        let html = "<table><tr><th>Skor</th><th>Hamle</th><th>Süre</th><th>Tarih</th></tr>";
-        for (let h of history) {
+        // 🔥 İlk 10 skoru al
+        history = history.slice(0, 10);
+
+        let html = "<table><tr><th>#</th><th>Skor</th><th>Hamle</th><th>Süre</th><th>Tarih</th></tr>";
+        history.forEach((h, index) => {
             const minutes = Math.floor(h.duration / 60);
             const seconds = h.duration % 60;
             const timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
             html += `<tr>
+                        <td>${index + 1}</td>
                         <td>${h.score}</td>
                         <td>${h.moves}</td>
                         <td>${timeFormatted}</td>
                         <td>${h.date}</td>
                     </tr>`;
-        }
+        });
         html += "</table>";
         tableDiv.innerHTML = html;
     }

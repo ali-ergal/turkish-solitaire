@@ -3,7 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Solitaire Tarzı Kart Oyunu</title>
+    <title>Decko</title>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#006400">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +13,7 @@
 
 <body>
     <div id="mainMenu" class="menu-screen">
-        <h1>🃏 8 Serili</h1>
+        <h1>🃏 Decko</h1>
         <button onclick="openSettingsModal()">🎮 Yeni Oyun</button>
         <button onclick="showScoreHistory()">📊 Skor Geçmişi</button>
         <button onclick="openHelp()">❓ Yardım</button>
@@ -127,6 +129,16 @@
     <audio id="winSound" src="sounds/win.mp3" preload="auto"></audio>
 
     <script src="game.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(function(registration) {
+              console.log('Service Worker kaydedildi:', registration.scope);
+            }).catch(function(error) {
+              console.log('Service Worker kaydedilirken hata:', error);
+            });
+        }
+        </script>
 </body>
 
 </html>
