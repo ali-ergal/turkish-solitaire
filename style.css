@@ -44,18 +44,25 @@ body {
     cursor: pointer;
   }
   
-  .menu-screen button:hover {
-    transform: scale(1.05);
-  }
-
   
 /* Üst menü alanı */
 .menu-bar {
     width: 100%;
     display: flex;
-    justify-content: right;
+    justify-content: space-between;
     margin-bottom: 20px;
   }
+
+  .left-buttons,
+.right-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.right-buttons button {
+  margin-left: 10px;
+}
   
   /* Yeni oyun butonu menüde */
   .menu-bar button {
@@ -67,11 +74,7 @@ body {
     transition: transform 0.2s, box-shadow 0.2s;
     padding: 0;
   }
-  
-  .menu-bar button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-  }
+
   
   .menu-bar button:active {
     transform: scale(0.98);
@@ -104,10 +107,6 @@ body {
     padding: 0;
   }
   
-  #undoBtn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  }
 
   .jokerWrapper button{
     background: transparent;
@@ -387,9 +386,6 @@ body {
   transition: all 0.2s ease;
 }
 
-#winModal button:hover {
-  transform: scale(1.05);
-}
 
 #scoreHistoryTable table {
   width: 100%;
@@ -419,11 +415,6 @@ button {
   transition: all 0.25s ease;
 }
 
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
-}
-
 button:active {
   transform: scale(0.98);
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
@@ -444,7 +435,7 @@ button:active {
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.08);
+  background: #006400;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 30px rgba(0,0,0,0.4);
@@ -482,6 +473,12 @@ button:active {
   font-weight: bold;
   color: white;
   cursor: pointer;
+}
+
+.help-content ul {
+  list-style-type: "🃏 ";
+  line-height: 1.8;
+  font-size: 16px;
 }
 
 .drawn-area {
@@ -575,5 +572,9 @@ button:active {
     box-shadow: none;
     font-size: 41px;
     padding: 0;
+  }
+
+  .jokerWrapper button:disabled{
+    opacity: 0.3;
   }
 }

@@ -1,0 +1,26 @@
+{
+    "tr": {
+        "record" : "Rekor",
+        "moves" : "Hamle",
+        "score" : "Skor",
+        "high_score" : "Yeni rekor!",
+        "time" : "Süre",
+        "ace" : "As",
+        "jack" : "Vale",
+        "queen" : "Kız",
+        "king" : "Papaz",
+        "game_over" : "Oyun bitti! Hiç kart yerleştiremedin.",
+        "game_win" : "Oyunu kazandınız!",
+        "try_again" : "Tekrar Dene",
+        "joker_already_used" : "Joker zaten kullanıldı.",
+        "joker_invalid" : "Joker kullanılacak kart kalmadı.",
+        "joker_used" : "Joker kullanıldı! Kart sona taşındı.",
+        "series_completed" : "seri tamamlandı! +100 puan",
+        "invalid_card_series" : "Bu kart bu seriye konulamaz.",
+        "invalid_undo" : "Geri alma devre dışı (kart yerleştirildi).",
+        "no_remaining_card_for_undo" : "Geri alınacak çekilmiş kart yok.",
+        "undo_success" : "Açılan kartlar geri alındı.",
+        "invalid_card" : "Bu kart geçersiz.",
+        "card_has_no_place" : "Bu kart için uygun bir seri yok."
+    }
+}

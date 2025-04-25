@@ -3,7 +3,7 @@ const suits = ["♠", "♥", "♣", "♦"];
 let deck = [], drawIndex = 0, drawnCards = [], table = [], turdaYerlesenKartSayisi = 0;
 let moveCount = 0, score = 0, comboCount = 0, lastPlaceTime = 0, highScore = Number(localStorage.getItem("highScore")) || 0;
 let startTime, timerInterval, selectedCard = null, completedSuits = [], lastDrawCount = 0, undoEnabled = false;
-let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint")), jokerUsed = false;
+let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint")), jokerUsed = false, soundEnabled = true;
 
 const seriesInfo = [
     { suit: "♥", direction: "asc", label: "As ♥", card_image: "ace_of_hearts.png" },
@@ -69,6 +69,8 @@ function updateTimer() {
 }
 
 function playSound(id) {
+    if (!soundEnabled) return; // Ses kapalıysa hiçbir şey yapma
+
     const audio = document.getElementById(id);
     if (audio) {
         audio.currentTime = 0;
@@ -109,7 +111,6 @@ function drawThree() {
     document.getElementById("status").innerText = "";
     if (drawIndex >= deck.length) {
         if (turdaYerlesenKartSayisi === 0 && jokerUsed === true) {
-            saveScoreHistory(score, moveCount);
             document.getElementById("status").innerHTML = `
               💀 Oyun bitti! Hiç kart yerleştiremedin.
               <br><button onclick="openSettingsFromLoss()">🔁 Tekrar Dene</button>
@@ -145,10 +146,6 @@ function drawThree() {
         hintTimeout = setTimeout(() => {
             showHint();
         }, 3000);
-    
-        setTimeout(() => {
-            showHint();
-        }, 300);
     }
 
     for (let i = 0; i < drawCount; i++) {
@@ -177,6 +174,7 @@ function useJoker() {
     deck.push(card);
   
     jokerUsed = true;
+    document.getElementById("useJoker").disabled = true;
     document.getElementById("status").innerText = `🃏 Joker kullanıldı! Kart sona taşındı.`;
     updateUI();
 }
@@ -535,9 +533,11 @@ function showHint() {
 
 function saveScoreHistory(score, moves) {
     let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
+    const duration = Math.floor((Date.now() - startTime) / 1000); // saniye cinsinden süre
     history.push({
         score,
         moves,
+        duration, // yeni eklenen alan
         date: new Date().toLocaleString()
     });
     localStorage.setItem("scoreHistory", JSON.stringify(history));
@@ -551,15 +551,33 @@ function showScoreHistory() {
     if (history.length === 0) {
         tableDiv.innerHTML = "<p>Henüz skor kaydı yok.</p>";
     } else {
-        let html = "<table><tr><th>Skor</th><th>Hamle</th><th>Tarih</th></tr>";
-        for (let h of history.reverse()) {
-            html += `<tr><td>${h.score}</td><td>${h.moves}</td><td>${h.date}</td></tr>`;
+        // Önce sıralama: yüksek skor > düşük süre
+        history.sort((a, b) => {
+            if (b.score !== a.score) {
+                return b.score - a.score; // skora göre azalan
+            } else {
+                return a.duration - b.duration; // skoru eşitse süreye göre artan
+            }
+        });
+
+        let html = "<table><tr><th>Skor</th><th>Hamle</th><th>Süre</th><th>Tarih</th></tr>";
+        for (let h of history) {
+            const minutes = Math.floor(h.duration / 60);
+            const seconds = h.duration % 60;
+            const timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            html += `<tr>
+                        <td>${h.score}</td>
+                        <td>${h.moves}</td>
+                        <td>${timeFormatted}</td>
+                        <td>${h.date}</td>
+                    </tr>`;
         }
         html += "</table>";
         tableDiv.innerHTML = html;
     }
 
-    modal.style.display = "block";
+    modal.style.display = "flex";
 }
 
 function closeScoreHistory() {
@@ -569,6 +587,14 @@ function closeScoreHistory() {
 function clearScoreHistory() {
     localStorage.removeItem("scoreHistory");
     showScoreHistory();
+}
+
+function openHelp() {
+    document.getElementById("helpModal").style.display = "flex";
+}
+
+function closeHelp() {
+    document.getElementById("helpModal").style.display = "none";
 }
 
 function triggerWinCelebration() {
@@ -646,6 +672,11 @@ document.getElementById("deck").addEventListener("click", drawThree);
 document.getElementById("undoBtn").addEventListener("click", undoDraw);
 document.getElementById("resetBtn").addEventListener("click", () => {
     document.getElementById("settingsModal").style.display = "flex";
+});
+document.getElementById("homeBtn").addEventListener("click", backToMainMenu);
+document.getElementById("soundToggleBtn").addEventListener("click", () => {
+    soundEnabled = !soundEnabled;
+    document.getElementById("soundToggleBtn").innerText = soundEnabled ? "🔊" : "🔇";
 });
 
 createDeck();
