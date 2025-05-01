@@ -602,3 +602,16 @@ button:active {
     opacity: 0.3;
   }
 }
+
+.nicknameWrapper input {
+  width: 90%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #999;
+  font-size: 16px;
+  margin-bottom: 5px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  outline: none;
+  box-sizing: border-box;
+}

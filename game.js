@@ -1,6 +1,6 @@
 const debug = false;
 const suits = ["♠", "♥", "♣", "♦"];
-let deck = [], drawIndex = 0, drawnCards = [], table = [], turdaYerlesenKartSayisi = 0;
+let deck = [], drawIndex = 0, drawnCards = [], table = [], currentRoundPlacedCards = 0;
 let moveCount = 0, score = 0, comboCount = 0, lastPlaceTime = 0, highScore = Number(localStorage.getItem("highScore")) || 0;
 let startTime, timerInterval, selectedCard = null, completedSuits = [], lastDrawCount = 0, undoEnabled = false;
 let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint")), jokerUsed = false, soundEnabled = true;
@@ -113,7 +113,7 @@ function drawThree() {
     document.getElementById("status").innerText = "";
 
     if (drawIndex >= deck.length) {
-        if (turdaYerlesenKartSayisi === 0 && jokerUsed === true) {
+        if (currentRoundPlacedCards === 0 && jokerUsed === true) {
             document.getElementById("status").innerHTML = `
               💀 Oyun bitti! Hiç kart yerleştiremedin.
               <br><button onclick="openSettingsFromLoss()">🔁 Tekrar Dene</button>
@@ -122,7 +122,7 @@ function drawThree() {
         }
 
         drawIndex = 0;
-        turdaYerlesenKartSayisi = 0;
+        currentRoundPlacedCards = 0;
         drawnCards = [];
         selectedCard = null;
         removeHighlight();
@@ -338,7 +338,7 @@ function placeCardOnSeries(index) {
             drawIndex--;
         }
 
-        turdaYerlesenKartSayisi++;
+        currentRoundPlacedCards++;
 
         comboCount++;
         const comboBonus = (comboCount - 1) * 5;
@@ -703,31 +703,36 @@ function showScoreHistory() {
     if (history.length === 0) {
         tableDiv.innerHTML = "<p>Henüz skor kaydı yok.</p>";
     } else {
-        // Önce sıralama
         history.sort((a, b) => {
-            if (b.score !== a.score) {
-                return b.score - a.score; // Skora göre azalan
-            } else {
-                return a.duration - b.duration; // Süreye göre artan
-            }
+            if (b.score !== a.score) return b.score - a.score;
+            return a.duration - b.duration;
         });
+        const top10 = history.slice(0, 10);
 
-        // 🔥 İlk 10 skoru al
-        history = history.slice(0, 10);
-
-        let html = "<table><tr><th>#</th><th>Skor</th><th>Hamle</th><th>Süre</th><th>Tarih</th></tr>";
-        history.forEach((h, index) => {
+        let html = `
+          <table>
+            <tr>
+              <th>#</th>
+              <th>Nickname</th>      <!-- added -->
+              <th>Skor</th>
+              <th>Hamle</th>
+              <th>Süre</th>
+              <th>Tarih</th>
+            </tr>
+        `;
+        top10.forEach((h, idx) => {
             const minutes = Math.floor(h.duration / 60);
             const seconds = h.duration % 60;
-            const timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-            html += `<tr>
-                        <td>${index + 1}</td>
-                        <td>${h.score}</td>
-                        <td>${h.moves}</td>
-                        <td>${timeFormatted}</td>
-                        <td>${h.date}</td>
-                    </tr>`;
+            html += `
+              <tr>
+                <td>${idx + 1}</td>
+                <td>${h.nickname}</td>   <!-- added -->
+                <td>${h.score}</td>
+                <td>${h.moves}</td>
+                <td>${minutes}:${seconds.toString().padStart(2,'0')}</td>
+                <td>${h.date}</td>
+              </tr>
+            `;
         });
         html += "</table>";
         tableDiv.innerHTML = html;
@@ -831,6 +836,26 @@ function openSettingsFromLoss() {
     if (settingsModal) settingsModal.style.display = "flex";
 }
 
+function checkNickname() {
+    const nickname = localStorage.getItem('deckoNickname');
+    if (!nickname) {
+        document.getElementById('nicknameModal').style.display = 'block';
+    } else {
+        startGame();
+    }
+}
+
+function submitNickname() {
+    const input = document.getElementById('nicknameInput').value.trim();
+    if (input.length > 0) {
+        localStorage.setItem('deckoNickname', input);
+        document.getElementById('nicknameModal').style.display = 'none';
+        startGame();
+    } else {
+        alert('❗Please enter a valid nickname.');
+    }
+}
+
 document.getElementById("deck").addEventListener("click", drawThree);
 document.getElementById("undoBtn").addEventListener("click", undoDraw);
 document.getElementById("resetBtn").addEventListener("click", () => {
@@ -842,4 +867,7 @@ document.getElementById("soundToggleBtn").addEventListener("click", () => {
     document.getElementById("soundToggleBtn").innerText = soundEnabled ? "🔊" : "🔇";
 });
 
-createDeck();
+window.onload = () => {
+    checkNickname();
+    createDeck();
+};
