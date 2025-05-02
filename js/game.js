@@ -92,7 +92,7 @@ function removeHighlight() {
 function cardImageFile(card) {
     const rankMap = { 1: "ace", 11: "jack", 12: "queen", 13: "king" };
     const suitMap = { "♠": "spades", "♥": "hearts", "♦": "diamonds", "♣": "clubs" };
-    return `/images/cards/${rankMap[card.rank] || card.rank}_of_${suitMap[card.suit]}.png`;
+    return `images/cards/${rankMap[card.rank] || card.rank}_of_${suitMap[card.suit]}.png`;
 }
 
 function formatCard(card) {
@@ -164,7 +164,7 @@ function renderDeckStack() {
 
     for (let i = 0; i < visibleCount; i++) {
         const img = document.createElement("img");
-        img.src = "/images/cards/back.png"; // back side of the card
+        img.src = "images/cards/back.png"; // back side of the card
         img.className = "deck-card";
         img.style.position = "absolute";
         img.style.right = `${i * 2}px`; // Slight horizontal offset
