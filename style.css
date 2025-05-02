@@ -564,6 +564,16 @@ button:active {
   cursor: pointer;
 }
 
+#helpModal .modal-content{
+  width: 100%;
+  height: 100%;
+  
+}
+
+#helpModal .modal-content .help-content{
+  text-align: left;
+}
+
 .help-content ul {
   list-style-type: "🃏 ";
   line-height: 1.8;
