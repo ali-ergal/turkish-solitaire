@@ -3,7 +3,7 @@ const suits = ["♠", "♥", "♣", "♦"];
 let deck = [], drawIndex = 0, drawnCards = [], table = [], currentRoundPlacedCards = 0;
 let moveCount = 0, score = 0, comboCount = 0, lastPlaceTime = 0, highScore = Number(localStorage.getItem("highScore")) || 0;
 let startTime, timerInterval, selectedCard = null, completedSuits = [], lastDrawCount = 0, undoEnabled = false;
-let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint")), jokerUsed = false, soundEnabled = true;
+let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint")), jokerUsed = false, soundEnabled = 0;
 
 const seriesInfo = [
     { suit: "♥", direction: "asc", label: "As ♥", card_image: "ace_of_hearts.png" },
@@ -57,9 +57,9 @@ function shuffle(array) {
 }
 
 function updateCounters() {
-    const highScoreDisplay = ` (Rekor: ${highScore})`;
-    document.getElementById("moveCounter").innerText = `Hamle: ${moveCount}`;
-    document.getElementById("scoreCounter").innerText = `Skor: ${score}${highScoreDisplay}`;
+    const highScoreDisplay = ` (${t("highScoreLabel", { n: 3 })}: ${highScore})`;
+    document.getElementById("moveCounter").innerText = `${t("moveLabel", { n: 3 })}: ${moveCount}`;
+    document.getElementById("scoreCounter").innerText = `${t("scoreLabel", { n: 3 })}: ${score}${highScoreDisplay}`;
 }
 
 function playSound(id) {
@@ -348,12 +348,12 @@ function placeCardOnSeries(index) {
             const minutes = Math.floor(duration / 60);
             const seconds = duration % 60;
             saveScoreHistory(score, moveCount);
-            let finalMessage = `Oyunu kazandınız!\nHamle: ${moveCount}, Skor: ${score}, Süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            let finalMessage = `${t("statusWin", { n: 3 })}\n${t("moveLabel", { n: 3 })}: ${moveCount}, ${t("scoreLabel", { n: 3 })}: ${score}, ${t("durationLabel", { n: 3 })}: ${minutes}:${seconds.toString().padStart(2, '0')}`;
             markDailyCompleted(); // 👈 after a win
             if (score > highScore) {
                 localStorage.setItem("highScore", score);
                 highScore = score;
-                finalMessage += `\n🎉 Yeni rekor!`;
+                finalMessage += `\n🎉 ${t("statusNewRecord", { n: 3 })}`;
             }
             updateCounters();
             clearInterval(timerInterval);
@@ -853,16 +853,30 @@ function updateTimer() {
     const seconds = diff % 60;
 }
 
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem("deckoSound", soundEnabled ? "1" : "0");
+    const btn = document.getElementById("soundToggleBtn");
+    if (btn) btn.innerText = soundEnabled ? "🔊" : "🔇";
+  }
+  
+  function initializeSoundToggle() {
+    const btn = document.getElementById("soundToggleBtn");
+    if (btn) btn.innerText = soundEnabled ? "🔊" : "🔇";
+  }
+  
+  document.addEventListener("DOMContentLoaded", () => {
+    initializeSoundToggle();
+    const btn = document.getElementById("soundToggleBtn");
+    if (btn) btn.addEventListener("click", toggleSound);
+  });
+
 document.getElementById("deck").addEventListener("click", drawThree);
 document.getElementById("undoBtn").addEventListener("click", undoDraw);
 document.getElementById("resetBtn").addEventListener("click", () => {
     document.getElementById("settingsModal").style.display = "flex";
 });
 document.getElementById("homeBtn").addEventListener("click", backToMainMenu);
-document.getElementById("soundToggleBtn").addEventListener("click", () => {
-    soundEnabled = !soundEnabled;
-    document.getElementById("soundToggleBtn").innerText = soundEnabled ? "🔊" : "🔇";
-});
 
 window.onload = () => {
     checkNickname();
