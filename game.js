@@ -49,7 +49,6 @@ function createDeck() {
     startTime = Date.now();
     clearInterval(timerInterval);
     timerInterval = setInterval(updateTimer, 1000);
-    updateTimer();
     document.getElementById("status").innerText = "";
 }
 
@@ -61,13 +60,6 @@ function updateCounters() {
     const highScoreDisplay = ` (Rekor: ${highScore})`;
     document.getElementById("moveCounter").innerText = `Hamle: ${moveCount}`;
     document.getElementById("scoreCounter").innerText = `Skor: ${score}${highScoreDisplay}`;
-}
-
-function updateTimer() {
-    const diff = Math.floor((Date.now() - startTime) / 1000);
-    const minutes = Math.floor(diff / 60);
-    const seconds = diff % 60;
-    document.getElementById("timer").innerText = `Süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function playSound(id) {
@@ -131,6 +123,9 @@ function drawThree() {
         updateUI();
         return;
     }
+
+    moveCount++;
+    updateCounters();
 
     const remaining = deck.length - drawIndex;
     const drawCount = Math.min(difficultyLevel, remaining);
@@ -343,7 +338,6 @@ function placeCardOnSeries(index) {
         comboCount++;
         const comboBonus = (comboCount - 1) * 5;
         score += 10 + comboBonus;
-        moveCount++;
         updateCounters();
 
         checkSuitCompletion(card.suit);
@@ -686,7 +680,9 @@ function showHint() {
 function saveScoreHistory(score, moves) {
     let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
     const duration = Math.floor((Date.now() - startTime) / 1000); // saniye cinsinden süre
+    const nickname = localStorage.getItem("deckoNickname");
     history.push({
+        nickname,
         score,
         moves,
         duration, // yeni eklenen alan
@@ -713,11 +709,10 @@ function showScoreHistory() {
           <table>
             <tr>
               <th>#</th>
-              <th>Nickname</th>      <!-- added -->
+              <th>Nickname</th>
               <th>Skor</th>
               <th>Hamle</th>
               <th>Süre</th>
-              <th>Tarih</th>
             </tr>
         `;
         top10.forEach((h, idx) => {
@@ -730,7 +725,6 @@ function showScoreHistory() {
                 <td>${h.score}</td>
                 <td>${h.moves}</td>
                 <td>${minutes}:${seconds.toString().padStart(2,'0')}</td>
-                <td>${h.date}</td>
               </tr>
             `;
         });
@@ -841,7 +835,7 @@ function checkNickname() {
     if (!nickname) {
         document.getElementById('nicknameModal').style.display = 'block';
     } else {
-        startGame();
+        createDeck();
     }
 }
 
@@ -850,10 +844,16 @@ function submitNickname() {
     if (input.length > 0) {
         localStorage.setItem('deckoNickname', input);
         document.getElementById('nicknameModal').style.display = 'none';
-        startGame();
+        createDeck();
     } else {
         alert('❗Please enter a valid nickname.');
     }
+}
+
+function updateTimer() {
+    const diff = Math.floor((Date.now() - startTime) / 1000);
+    const minutes = Math.floor(diff / 60);
+    const seconds = diff % 60;
 }
 
 document.getElementById("deck").addEventListener("click", drawThree);
