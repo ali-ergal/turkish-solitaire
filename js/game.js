@@ -92,7 +92,7 @@ function removeHighlight() {
 function cardImageFile(card) {
     const rankMap = { 1: "ace", 11: "jack", 12: "queen", 13: "king" };
     const suitMap = { "♠": "spades", "♥": "hearts", "♦": "diamonds", "♣": "clubs" };
-    return `images/cards/${rankMap[card.rank] || card.rank}_of_${suitMap[card.suit]}.png`;
+    return `/images/cards/${rankMap[card.rank] || card.rank}_of_${suitMap[card.suit]}.png`;
 }
 
 function formatCard(card) {
@@ -106,10 +106,7 @@ function drawThree() {
 
     if (drawIndex >= deck.length) {
         if (currentRoundPlacedCards === 0 && jokerUsed === true) {
-            document.getElementById("status").innerHTML = `
-              💀 Oyun bitti! Hiç kart yerleştiremedin.
-              <br><button onclick="openSettingsFromLoss()">🔁 Tekrar Dene</button>
-            `;
+            document.getElementById("status").innerText = t("statusGameOver", { n: 3 });
             return;
         }
 
@@ -167,7 +164,7 @@ function renderDeckStack() {
 
     for (let i = 0; i < visibleCount; i++) {
         const img = document.createElement("img");
-        img.src = "images/cards/back.png"; // back side of the card
+        img.src = "/images/cards/back.png"; // back side of the card
         img.className = "deck-card";
         img.style.position = "absolute";
         img.style.right = `${i * 2}px`; // Slight horizontal offset
@@ -271,12 +268,12 @@ function updateDrawnCardsAnimated(cards) {
 
 function useJoker() {
     if (jokerUsed) {
-        document.getElementById("status").innerText = "❌ Joker zaten kullanıldı."
+        document.getElementById("status").innerText = t("statusJokerAlready", { n: 3 });
       return;
     }
   
     if (drawIndex >= deck.length) {
-      document.getElementById("status").innerText = "⛔ Joker kullanılacak kart kalmadı.";
+        document.getElementById("status").innerText = t("statusJokerEmpty", { n: 3 });
       return;
     }
   
@@ -286,7 +283,7 @@ function useJoker() {
   
     jokerUsed = true;
     document.getElementById("useJoker").disabled = true;
-    document.getElementById("status").innerText = `🃏 Joker kullanıldı! Kart sona taşındı.`;
+    document.getElementById("status").innerText = t("statusJokerUsed", { n: 3 });
     updateUI();
 }
 
@@ -321,7 +318,7 @@ function placeCardOnSeries(index) {
 
         if (table[index].length === 13) {
             score += 100;
-            document.getElementById("status").innerText = `🎉 ${index + 1}. seri tamamlandı! +100 puan`;
+            document.getElementById("status").innerText = t("statusSeriesComplete", { n: 3 });
         }
         drawnCards.pop();
 
@@ -352,7 +349,7 @@ function placeCardOnSeries(index) {
             const seconds = duration % 60;
             saveScoreHistory(score, moveCount);
             let finalMessage = `Oyunu kazandınız!\nHamle: ${moveCount}, Skor: ${score}, Süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-
+            markDailyCompleted(); // 👈 after a win
             if (score > highScore) {
                 localStorage.setItem("highScore", score);
                 highScore = score;
@@ -378,18 +375,18 @@ function placeCardOnSeries(index) {
             }, 1000);
         }
     } else {
-        document.getElementById("status").innerText = "⛔ Bu kart bu seriye konulamaz.";
+        document.getElementById("status").innerText = t("statusCardNotAllowed", { n: 3 });
     }
 }
 
 function undoDraw() {
     if (!undoEnabled) {
-        document.getElementById("status").innerText = "🚫 Geri alma devre dışı (kart yerleştirildi).";
+        document.getElementById("status").innerText = t("statusUndoBlocked", { n: 3 });
         return;
     }
 
     if (lastDrawCount === 0 || drawnCards.length < lastDrawCount) {
-        document.getElementById("status").innerText = "⛔ Geri alınacak çekilmiş kart yok.";
+        document.getElementById("status").innerText = t("statusUndoNone", { n: 3 });
         return;
     }
 
@@ -445,7 +442,7 @@ function undoDraw() {
                     drawIndex -= lastDrawCount;
                     updateUI();
 
-                    document.getElementById("status").innerText = "↩️ Açılan kartlar geri alındı.";
+                    document.getElementById("status").innerText = t("statusUndoDone", { n: 3 });
                     lastDrawCount = 0;
                     undoEnabled = false;
                     selectedCard = null;
@@ -567,7 +564,7 @@ function updateUI() {
 function handleDropCard(seriesIndex, droppedCard) {
     const top = drawnCards[drawnCards.length - 1];
     if (!top || top.suit !== droppedCard.suit || top.rank !== droppedCard.rank) {
-        document.getElementById("status").innerText = "❌ Bu kart geçersiz.";
+        document.getElementById("status").innerText = t("statusCardInvalid", { n: 3 });
         return;
     }
 
@@ -575,7 +572,7 @@ function handleDropCard(seriesIndex, droppedCard) {
         playDropSound();
         placeCardOnSeries(seriesIndex);
     } else {
-        document.getElementById("status").innerText = "⛔ Bu seriye bu kart konamaz.";
+        document.getElementById("status").innerText = t("statusCardInvalid", { n: 3 });
     }
 }
 
@@ -589,7 +586,7 @@ function tryAutoPlaceCard(card) {
     }
 
     if (targetIndex === -1) {
-        document.getElementById("status").innerText = "❌ Bu kart için uygun bir seri yok.";
+        document.getElementById("status").innerText = t("statusCardNoTarget", { n: 3 });
         return;
     }
 
@@ -621,9 +618,9 @@ function animateCardToSeries(card, seriesIndex) {
         targets: flying,
         translateX: dx,
         translateY: dy,
-        scale: 0.8,
-        opacity: 0.7,
-        duration: 600,
+        scale: 1,
+        opacity: 0.8,
+        duration: 400,
         easing: "easeOutQuad",
         complete: () => {
             flying.remove();

@@ -15,9 +15,16 @@
 <body>
     <div id="mainMenu" class="menu-screen">
         <h1>🃏 Decko</h1>
+        
         <button onclick="openSettingsModal()">🎮 Yeni Oyun</button>
+        <button id="dailyChallengeBtn" onclick="startDailyChallenge()">🗓 Günlük Görev</button>
         <button onclick="showScoreHistory()">📊 Skor Geçmişi</button>
         <button onclick="openHelp()">❓ Yardım</button>
+
+        <select id="languageSelect" onchange="changeLanguage(this.value)">
+            <option value="tr">🇹🇷</option>
+            <option value="en">🇬🇧</option>
+          </select>
     </div>
 
 
@@ -136,7 +143,9 @@
     <audio id="newTurnSound" src="sounds/new-turn.mp3" preload="auto"></audio>
     <audio id="winSound" src="sounds/win.mp3" preload="auto"></audio>
 
-    <script src="game.js"></script>
+    <script src="js/language.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/dailyChallange.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js')

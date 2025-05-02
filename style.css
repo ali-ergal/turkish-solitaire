@@ -1,157 +1,164 @@
 body {
   background: url('images/felt_texture.png') repeat;
-    background-color: #067a00;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0;
-    padding: 10px;
-    font-family: sans-serif;
-    overflow: hidden;
-  }
+  background-color: #067a00;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 10px;
+  font-family: sans-serif;
+  overflow: hidden;
+}
 
-  h1 {
-    margin-top: 10px;
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: white;
-  }
+h1 {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: white;
+}
 
-  .menu-screen {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 90vh;
-    color: white;
-    text-align: center;
-    padding: 30px 20px;
-    gap: 20px;
-  }
-  
-  .menu-screen h1 {
-    font-size: 36px;
-    margin-bottom: 20px;
-  }
-  
-  .menu-screen button {
-    padding: 14px 28px;
-    font-size: 18px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #28a745, #218838);
-    color: white;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    transition: transform 0.2s ease;
-    cursor: pointer;
-  }
-  
-  
+.menu-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  color: white;
+  text-align: center;
+  padding: 30px 20px;
+  gap: 20px;
+}
+
+.menu-screen h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.menu-screen button {
+  padding: 14px 28px;
+  font-size: 18px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #28a745, #218838);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+#languageSelect {
+  font-size: 30px;
+  background: transparent;
+  border: none;
+  color: white;
+}
+
+
 /* Üst menü alanı */
 .menu-bar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    margin-top:40px;
-  }
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
 
-  .left-buttons,
+.left-buttons,
 .right-buttons {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .right-buttons button {
   margin-left: 10px;
 }
-  
-  /* Yeni oyun butonu menüde */
-  .menu-bar button {
-    font-size: 30px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    box-shadow: none;
-    transition: transform 0.2s, box-shadow 0.2s;
-    padding: 0;
-  }
 
-  
-  .menu-bar button:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-  
-  /* Geri al butonu: kapalı destenin altına */
+/* Yeni oyun butonu menüde */
+.menu-bar button {
+  font-size: 30px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  box-shadow: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 0;
+}
 
-  .controls{
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
 
-  .undo-wrapper {
-    display: flex;
-    margin-top: 10px;
-  }
-  
-  #undoBtn {
-    padding: 6px 14px;
-    font-size: 30px;
-    font-weight: bold;
-    color: black;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    box-shadow: none;
-    transition: transform 0.2s, box-shadow 0.2s;
-    padding: 0;
-  }
-  
+.menu-bar button:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
-  .jokerWrapper button{
-    background: transparent;
-    box-shadow: none;
-    font-size: 40px;
-    padding: 0;
-    margin-left: -5px;
-  }
+/* Geri al butonu: kapalı destenin altına */
 
-  .game-area {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 50px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-  .deck-area {
-    display: flex;
-    flex-direction: row;
-    gap: 70px;
-    margin-bottom: 10px;
-    margin-top:40px
-  }
+.undo-wrapper {
+  display: flex;
+  margin-top: 10px;
+}
 
-  
-  
+#undoBtn {
+  padding: 6px 14px;
+  font-size: 30px;
+  font-weight: bold;
+  color: black;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  box-shadow: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 0;
+}
+
+
+.jokerWrapper button {
+  background: transparent;
+  box-shadow: none;
+  font-size: 40px;
+  padding: 0;
+  margin-left: -5px;
+}
+
+.game-area {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 50px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.deck-area {
+  display: flex;
+  flex-direction: row;
+  gap: 70px;
+  margin-bottom: 10px;
+  margin-top: 40px
+}
+
+
+
 
 .deck {
-    width: 120px;
-    height: 175px;
-    border-radius: 8px;
-    border: 2px solid white;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
-    background-image: url('images/cards/back.png');
-    /* 👈 senin kart arkası */
-    background-size: cover;
-    background-position: center;
-    cursor: pointer;
-    transition: opacity 0.3s ease;
+  width: 120px;
+  height: 175px;
+  border-radius: 8px;
+  border: 2px solid white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  background-image: url('images/cards/back.png');
+  /* 👈 senin kart arkası */
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
 }
 
 #deck {
@@ -164,91 +171,92 @@ body {
   width: 120px;
   height: 175px;
   border-radius: 6px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   transition: transform 0.2s ease;
 }
 
 .drawn-area {
-    width: 120px;
-    height: 175px;
-    position: relative;
-  }
+  width: 120px;
+  height: 175px;
+  position: relative;
+}
 
 .deck.empty {
-    background-image: none;
-    border: 2px dashed rgba(255, 255, 255, 0.3);
-    cursor: default;
-    opacity: 0.4;
+  background-image: none;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  cursor: default;
+  opacity: 0.4;
 }
 
 .deck.flash {
-    animation: flashDeck 0.5s ease;
+  animation: flashDeck 0.5s ease;
 }
 
 @keyframes flashDeck {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 transparent;
-    }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 transparent;
+  }
 
-    50% {
-        transform: scale(1.1);
-        box-shadow: 0 0 15px #fff;
-    }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #fff;
+  }
 
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 transparent;
-    }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 transparent;
+  }
 }
 
 .card-img {
-    width: 120px;
-    height: auto;
-    display: block;
-    border-radius: 6px;
-    background: white;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  width: 120px;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 .card-img.selected {
-    outline: 3px solid yellow;
-    transform: scale(1.1);
+  outline: 3px solid yellow;
+  transform: scale(1.1);
 }
 
 .flying-card {
-    background-color: #fff;
+  background-color: #fff;
 }
 
 .table-area {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, auto);
-    gap: 8px;
-    max-width: 500px;
-    width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, auto);
+  gap: 8px;
+  max-width: 500px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .game-area {
+    flex-direction: row;
+    /* masa sağda, deste solda */
+    align-items: flex-start;
   }
 
-  @media (min-width: 768px) {
-    .game-area {
-      flex-direction: row; /* masa sağda, deste solda */
-      align-items: flex-start;
-    }
-
-  }
+}
 
 .series-container {
-    width: 120px;
-    height: 175px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
+  width: 120px;
+  height: 175px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
 }
 
 .series-container.hint {
@@ -261,87 +269,141 @@ body {
   opacity: 0.3;
 }
 
-.series-container.empty.as-hearts { background-image: url("images/cards/ace_of_hearts.png"); }
-.series-container.empty.king-hearts { background-image: url("images/cards/king_of_hearts.png"); }
-.series-container.empty.as-clubs { background-image: url("images/cards/ace_of_clubs.png"); }
-.series-container.empty.king-clubs { background-image: url("images/cards/king_of_clubs.png"); }
-.series-container.empty.as-diamonds { background-image: url("images/cards/ace_of_diamonds.png"); }
-.series-container.empty.king-diamonds { background-image: url("images/cards/king_of_diamonds.png"); }
-.series-container.empty.as-spades { background-image: url("images/cards/ace_of_spades.png"); }
-.series-container.empty.king-spades { background-image: url("images/cards/king_of_spades.png"); }
+.series-container.empty.as-hearts {
+  background-image: url("images/cards/ace_of_hearts.png");
+}
+
+.series-container.empty.king-hearts {
+  background-image: url("images/cards/king_of_hearts.png");
+}
+
+.series-container.empty.as-clubs {
+  background-image: url("images/cards/ace_of_clubs.png");
+}
+
+.series-container.empty.king-clubs {
+  background-image: url("images/cards/king_of_clubs.png");
+}
+
+.series-container.empty.as-diamonds {
+  background-image: url("images/cards/ace_of_diamonds.png");
+}
+
+.series-container.empty.king-diamonds {
+  background-image: url("images/cards/king_of_diamonds.png");
+}
+
+.series-container.empty.as-spades {
+  background-image: url("images/cards/ace_of_spades.png");
+}
+
+.series-container.empty.king-spades {
+  background-image: url("images/cards/king_of_spades.png");
+}
 
 .series-container img {
-    position: absolute;
-    top: 0;
-    left: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .status {
-    font-size: 18px;
-    margin-top: 20px;
-    text-align: center;
-    color: #fff;
+  font-size: 18px;
+  margin-top: 20px;
+  text-align: center;
+  color: #fff;
 }
 
-.status button{
-  margin-top:20px
+.status button {
+  margin-top: 20px
 }
 
 .counters {
-    font-size: 18px;
-    margin-bottom: 15px;
-    color: white;
-    position: fixed;
-    bottom: 0;
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: white;
+  position: fixed;
+  bottom: 0;
 }
 
 .series-container.drag-over {
-    border-color: yellow;
+  border-color: yellow;
 }
 
 
 
-  /* 🃏 Kart Yerleştirme - Hafif parlayan animasyon */
+/* 🃏 Kart Yerleştirme - Hafif parlayan animasyon */
 @keyframes cardDropFlash {
-    0% { box-shadow: 0 0 0px rgba(255,255,0,0); }
-    50% { box-shadow: 0 0 15px rgba(255,255,0,0.7); }
-    100% { box-shadow: 0 0 0px rgba(255,255,0,0); }
-  }
-  
-  .series-container.flash {
-    animation: cardDropFlash 0.4s ease-in-out;
-  }
-  
-  /* 🎉 Seri Tamamlandığında Parıltı Efekti */
-  @keyframes seriesGlow {
-    0% { box-shadow: 0 0 0px rgba(0,255,0,0); }
-    50% { box-shadow: 0 0 20px rgba(0,255,0,0.8); }
-    100% { box-shadow: 0 0 0px rgba(0,255,0,0); }
-  }
-  
-  .series-container.complete {
-    animation: seriesGlow 1s ease-in-out;
-  }
-  
-  /* 💀 Kaybetme Anı - Ekran Titreşim Efekti */
-  @keyframes screenShake {
-    0% { transform: translate(0px, 0px); }
-    25% { transform: translate(4px, -4px); }
-    50% { transform: translate(-4px, 4px); }
-    75% { transform: translate(4px, 4px); }
-    100% { transform: translate(0px, 0px); }
-  }
-  
-  body.shake {
-    animation: screenShake 0.4s ease;
+  0% {
+    box-shadow: 0 0 0px rgba(255, 255, 0, 0);
   }
 
-  /* 🃏 Kart Uçuş Animasyonu */
+  50% {
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.7);
+  }
+
+  100% {
+    box-shadow: 0 0 0px rgba(255, 255, 0, 0);
+  }
+}
+
+.series-container.flash {
+  animation: cardDropFlash 0.4s ease-in-out;
+}
+
+/* 🎉 Seri Tamamlandığında Parıltı Efekti */
+@keyframes seriesGlow {
+  0% {
+    box-shadow: 0 0 0px rgba(0, 255, 0, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+  }
+
+  100% {
+    box-shadow: 0 0 0px rgba(0, 255, 0, 0);
+  }
+}
+
+.series-container.complete {
+  animation: seriesGlow 1s ease-in-out;
+}
+
+/* 💀 Kaybetme Anı - Ekran Titreşim Efekti */
+@keyframes screenShake {
+  0% {
+    transform: translate(0px, 0px);
+  }
+
+  25% {
+    transform: translate(4px, -4px);
+  }
+
+  50% {
+    transform: translate(-4px, 4px);
+  }
+
+  75% {
+    transform: translate(4px, 4px);
+  }
+
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+
+body.shake {
+  animation: screenShake 0.4s ease;
+}
+
+/* 🃏 Kart Uçuş Animasyonu */
 @keyframes winFly {
   0% {
     transform: translateY(0) rotate(0deg);
     opacity: 1;
   }
+
   100% {
     transform: translateY(-600px) rotate(720deg);
     opacity: 0;
@@ -369,7 +431,8 @@ body {
   font-size: 24px;
   text-align: center;
   flex-direction: column;
-  display: none; /* başlangıçta gizli */
+  display: none;
+  /* başlangıçta gizli */
 }
 
 #winModal h2 {
@@ -392,7 +455,7 @@ body {
   border-radius: 6px;
   color: white;
   cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
   transition: all 0.2s ease;
 }
 
@@ -403,7 +466,8 @@ body {
   margin-top: 10px;
 }
 
-#scoreHistoryTable th, #scoreHistoryTable td {
+#scoreHistoryTable th,
+#scoreHistoryTable td {
   padding: 8px;
   border: 1px solid #666;
   text-align: center;
@@ -421,13 +485,13 @@ button {
   cursor: pointer;
   background: linear-gradient(135deg, #6f42c1, #6610f2);
   color: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.25s ease;
 }
 
 button:active {
   transform: scale(0.98);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* 🪟 Modern Modal - Glassmorphism */
@@ -448,7 +512,7 @@ button:active {
   background: #006400;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   padding: 25px 30px;
   max-width: 400px;
   width: 70%;
@@ -472,7 +536,7 @@ button:active {
   border: 1px solid #999;
   background-color: rgba(255, 255, 255, 0.15);
   color: white;
-  margin-bottom:20px;
+  margin-bottom: 20px;
 }
 
 .modal-content .close {
@@ -500,7 +564,7 @@ button:active {
 .drawn-area img {
   position: absolute;
   transition: transform 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .drawn-area img:nth-child(1) {
@@ -516,7 +580,7 @@ button:active {
 .drawn-area img:nth-child(3) {
   left: 30px;
   z-index: 3;
-  opacity: 1; 
+  opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -531,7 +595,7 @@ button:active {
     margin-left: 0;
     position: fixed;
     bottom: 65px;
-    right: 40px;  
+    right: 40px;
     gap: 50px;
   }
 
@@ -556,22 +620,22 @@ button:active {
     width: 80px;
     height: 120px;
   }
-  
+
   #deck img.deck-card {
     width: 80px;
     height: 120px;
     border-radius: 6px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     transition: transform 0.2s ease;
   }
 
-  .undo-wrapper{
+  .undo-wrapper {
     position: fixed;
     bottom: 221px;
     right: 38px;
   }
 
-  #undoBtn{
+  #undoBtn {
     padding: 0;
     font-size: 30px;
     font-weight: bold;
@@ -584,7 +648,7 @@ button:active {
     transition: transform 0.2s, box-shadow 0.2s;
   }
 
-  .jokerWrapper{
+  .jokerWrapper {
     margin: 0;
     position: fixed;
     bottom: 270px;
@@ -598,7 +662,7 @@ button:active {
     padding: 0;
   }
 
-  .jokerWrapper button:disabled{
+  .jokerWrapper button:disabled {
     opacity: 0.3;
   }
 }
@@ -610,7 +674,7 @@ button:active {
   border: 1px solid #999;
   font-size: 16px;
   margin-bottom: 5px;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   color: white;
   outline: none;
   box-sizing: border-box;
