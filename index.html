@@ -12,18 +12,20 @@
 
 <body>
     <div id="mainMenu" class="menu-screen">
-        <h1>🃏 Decko</h1>
-        
-        <button onclick="openSettingsModal()">🎮 Yeni Oyun</button>
-        <button id="dailyChallengeBtn" onclick="startDailyChallenge()">🗓 Günlük Görev</button>
-        <button onclick="showScoreHistory()">📊 Skor Geçmişi</button>
-        <button onclick="openHelp()">❓ Yardım</button>
-
-        <select id="languageSelect" onchange="changeLanguage(this.value)">
-            <option value="tr">🇹🇷</option>
-            <option value="en">🇬🇧</option>
+        <div class="menu-top-bar">
+          <button onclick="openHelp()">❓</button>
+          <select id="languageSelect" onchange="changeLanguage(this.value)">
+            <option value="tr">🇹🇷 Türkçe</option>
+            <option value="en">🇬🇧 English</option>
           </select>
-    </div>
+        </div>
+        <h1>🃏 Decko</h1>
+        <div class="menu-buttons-horizontal">
+          <button onclick="openSettingsModal()"><span>🎮</span>Yeni Oyun</button>
+          <button id="dailyChallengeBtn" onclick="startDailyChallenge()"><span>🗓</span>Günlük Görev</button>
+          <button onclick="showScoreHistory()"><span>📊</span>Skor Geçmişi</button>
+        </div>
+      </div>
 
 
 
