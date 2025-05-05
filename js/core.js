@@ -28,7 +28,7 @@ function createDeck() {
     moveCount = score = 0;
     completedSuits = [];
     jokerUsed = false;
-    document.getElementById("useJoker").disabled = false;
+    document.getElementById("useJokerBtn").disabled = false;
     updateCounters();
 
     const toggle = document.getElementById("autoHintToggle");
@@ -275,7 +275,7 @@ function useJoker() {
     deck.push(card);
 
     jokerUsed = true;
-    document.getElementById("useJoker").disabled = true;
+    document.getElementById("useJokerBtn").disabled = true;
     document.getElementById("status").innerText = t("statusJokerUsed", { n: 3 });
     updateUI();
 }
@@ -309,5 +309,3 @@ function showHint() {
 }
 
 window.addEventListener("DOMContentLoaded", createDeck);
-document.getElementById("deck").addEventListener("click", drawThree);
-document.getElementById("undoBtn").addEventListener("click", undoDraw);

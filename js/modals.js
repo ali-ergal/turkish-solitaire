@@ -93,9 +93,3 @@ function openSettingsFromLoss() {
     const settingsModal = document.getElementById("settingsModal");
     if (settingsModal) settingsModal.style.display = "flex";
 }
-
-document.getElementById("homeBtn").addEventListener("click", backToMainMenu);
-
-document.getElementById("resetBtn").addEventListener("click", () => {
-    document.getElementById("settingsModal").style.display = "flex";
-});

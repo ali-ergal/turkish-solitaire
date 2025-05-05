@@ -92,7 +92,7 @@ function createDeck(isDaily = false) {
     moveCount = score = 0;
     completedSuits = [];
     jokerUsed = false;
-    document.getElementById("useJoker").disabled = false;
+    document.getElementById("useJokerBtn").disabled = false;
     updateCounters();
 
     const toggle = document.getElementById("autoHintToggle");

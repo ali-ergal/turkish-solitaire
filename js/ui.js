@@ -39,7 +39,7 @@ function renderDeckStack() {
 }
 
 function updateJokerButtonState() {
-    const btn = document.getElementById("useJoker");
+    const btn = document.getElementById("useJokerBtn");
     if (!btn) return;
     btn.disabled = jokerUsed || drawnCards.length > 0 || drawIndex >= deck.length;
   }

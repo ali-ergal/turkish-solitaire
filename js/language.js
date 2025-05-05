@@ -99,9 +99,11 @@ function updateLanguageTexts() {
   const $ = id => document.getElementById(id);
 
   $("dailyChallengeBtn").innerText = hasPlayedDaily() ? t("dailyCompleted") : t("dailyChallenge");
-  document.querySelector("button[onclick='openSettingsModal()']").innerText = t("newGame");
-  document.querySelector("button[onclick='showScoreHistory()']").innerText = t("scoreHistory");
-  document.querySelector("button[onclick='openHelp()']").innerText = t("help");
+
+  document.getElementById("openNewGameBtn").innerText = t("newGame");
+  document.getElementById("showScoreHistoryBtn").innerText = t("scoreHistory");
+  document.getElementById("openHelpBtn").innerText = t("help");
+
   const selector = $("languageSelect");
   if (selector) selector.value = currentLanguage;
 
@@ -114,7 +116,7 @@ function updateLanguageTexts() {
   }
   const label = $("autoHintToggle").parentNode;
   if (label) label.lastChild.textContent = t("autoHint");
-  $("settingsModal").querySelector("button[onclick='startGameFromModal()']").innerText = t("start");
+  document.getElementById("newGameBtn").innerText = t("start");
 
   $("winModal").querySelector("h2").innerText = t("winTitle");
   $("winModal").querySelector("button").innerText = t("playAgain");

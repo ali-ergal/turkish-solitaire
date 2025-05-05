@@ -13,7 +13,7 @@
 <body>
     <div id="mainMenu" class="menu-screen">
         <div class="menu-top-bar">
-          <button onclick="openHelp()">❓</button>
+          <button id="openHelpBtn">❓</button>
           <select id="languageSelect" onchange="changeLanguage(this.value)">
             <option value="tr">🇹🇷 Türkçe</option>
             <option value="en">🇬🇧 English</option>
@@ -21,9 +21,9 @@
         </div>
         <h1>🃏 Decko</h1>
         <div class="menu-buttons-horizontal">
-          <button onclick="openSettingsModal()"><span>🎮</span>Yeni Oyun</button>
-          <button id="dailyChallengeBtn" onclick="startDailyChallenge()"><span>🗓</span>Günlük Görev</button>
-          <button onclick="showScoreHistory()"><span>📊</span>Skor Geçmişi</button>
+          <button id="openNewGameBtn"><span>🎮</span>Yeni Oyun</button>
+          <button id="dailyChallengeBtn"><span>🗓</span>Günlük Görev</button>
+          <button id="showScoreHistoryBtn"><span>📊</span>Skor Geçmişi</button>
         </div>
       </div>
 
@@ -54,7 +54,7 @@
             </div>
 
             <div class="jokerWrapper" id="jokerWrapper" style="display: none;">
-                <button id="useJoker" onclick="useJoker()">🃏</button>
+                <button id="useJokerBtn">🃏</button>
             </div>
         </div>
 
@@ -75,7 +75,7 @@
     <div id="winModal" style="display: none;">
         <h2>🏆 Tebrikler!</h2>
         <p id="winStats"></p>
-        <button onclick="openSettingsFromWin()">🔁 Tekrar Oyna</button>
+        <button id="tryAgainBtn">🔁 Tekrar Oyna</button>
     </div>
 
     <div id="settingsModal" class="modal">
@@ -95,14 +95,14 @@
                 </label>
             </div>
             <div style="margin-top: 20px;">
-                <button onclick="startGameFromModal()">✅ Başla</button>
+                <button id="newGameBtn">✅ Başla</button>
             </div>
         </div>
     </div>
 
     <div id="scoreHistoryModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeScoreHistory()">&times;</span>
+            <span id="closeScoreHistoryBtn" class="close">&times;</span>
             <h2>📊 Skor Geçmişi</h2>
             <div id="scoreHistoryTable"></div>
             <!-- <button onclick="clearScoreHistory()">🗑 Temizle</button> -->
@@ -111,12 +111,12 @@
 
     <div id="helpModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeHelp()">&times;</span>
+            <span id="closeHelpSpn" class="close">&times;</span>
             <h2></h2>
             <div class="help-content">
                 
             </div>
-            <button onclick="closeHelp()">✅ Anladım</button>
+            <button id="closeHelpBtn">✅ Anladım</button>
         </div>
     </div>
 
