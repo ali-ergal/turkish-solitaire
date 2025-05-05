@@ -1,3 +1,5 @@
+let currentLanguage = localStorage.getItem("deckoLang") || "tr";
+
 const translations = {
   tr: {
     newGame: "🎮 Yeni Oyun",
@@ -78,8 +80,6 @@ const translations = {
     statusCardNoTarget: "❌ No valid series for this card."
   }
 };
-
-let currentLanguage = localStorage.getItem("deckoLang") || "tr";
 
 function t(key, params = {}) {
   let text = translations[currentLanguage][key] || key;

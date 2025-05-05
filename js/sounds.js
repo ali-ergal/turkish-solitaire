@@ -1,3 +1,5 @@
+let soundEnabled = 0
+
 function playSound(id) {
     if (!soundEnabled) return; // Ses kapalıysa hiçbir şey yapma
 

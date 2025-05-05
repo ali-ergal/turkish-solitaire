@@ -1,4 +1,13 @@
+let isAnimating = false;
+
+function setAnimationState(active) {
+    isAnimating = active;
+}
+
 function animateCardToSeries(card, seriesIndex) {
+    if (isAnimating) return;
+    setAnimationState(true);
+
     const cardImg = document.querySelector('#drawnCards img');
     const targetBox = document.querySelectorAll('.series-container')[seriesIndex];
 
@@ -30,11 +39,15 @@ function animateCardToSeries(card, seriesIndex) {
         complete: () => {
             flying.remove();
             placeCardOnSeries(seriesIndex);
+            setAnimationState(false);
         }
     });
 }
 
-function updateDrawnCardsAnimated(cards) {
+function animateCardDraw(cards) {
+    if (isAnimating) return;
+    setAnimationState(true);
+
     const drawnDiv = document.getElementById("drawnCards");
     const deckEl = document.getElementById("deck");
     const deckRect = deckEl.getBoundingClientRect();
@@ -106,7 +119,63 @@ function updateDrawnCardsAnimated(cards) {
                         img.addEventListener("click", () => {
                             tryAutoPlaceCard(card);
                         });
+                        setAnimationState(false);
                     });
+                }
+            }
+        });
+    });
+}
+
+function animateUndoDraw(cardsToReturn, existingCards, deckRect, drawnDiv) {
+    if (isAnimating) return;
+    setAnimationState(true);
+
+    const flyingBackCards = [];
+    let animationsCompleted = 0;
+
+    cardsToReturn.forEach((card, i) => {
+        const img = existingCards[i];
+        const fromRect = img.getBoundingClientRect();
+
+        const flying = document.createElement("img");
+        flying.src = cardImageFile(card);
+        flying.className = "flying-card";
+        flying.style.position = "fixed";
+        flying.style.left = fromRect.left + "px";
+        flying.style.top = fromRect.top + "px";
+        flying.style.width = "80px";
+        flying.style.height = "120px";
+        flying.style.zIndex = 100 + i;
+        document.body.appendChild(flying);
+
+        const dx = (deckRect.left + deckRect.width / 2 - 35) - fromRect.left;
+        const dy = (deckRect.top + deckRect.height / 2 - 55) - fromRect.top;
+
+        anime({
+            targets: flying,
+            translateX: dx,
+            translateY: dy,
+            opacity: 0.5,
+            duration: 500,
+            delay: i * 150,
+            easing: "easeOutExpo",
+            complete: () => {
+                flyingBackCards.push(flying);
+                animationsCompleted++;
+
+                if (animationsCompleted === cardsToReturn.length) {
+                    flyingBackCards.forEach(card => card.remove());
+
+                    drawnDiv.innerHTML = "";
+                    drawIndex -= lastDrawCount;
+                    updateUI();
+
+                    document.getElementById("status").innerText = t("statusUndoDone", { n: 3 });
+                    lastDrawCount = 0;
+                    undoEnabled = false;
+                    selectedCard = null;
+                    setAnimationState(false);
                 }
             }
         });

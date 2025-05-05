@@ -38,7 +38,15 @@ function renderDeckStack() {
     }
 }
 
+function updateJokerButtonState() {
+    const btn = document.getElementById("useJoker");
+    if (!btn) return;
+    btn.disabled = jokerUsed || drawnCards.length > 0 || drawIndex >= deck.length;
+  }
+
 function updateUI() {
+    updateJokerButtonState();
+
     const deckEl = document.getElementById("deck");
     if (drawIndex >= deck.length) {
         deckEl.classList.add("empty");

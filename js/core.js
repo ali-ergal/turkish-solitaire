@@ -1,9 +1,9 @@
 const debug = false;
 const suits = ["♠", "♥", "♣", "♦"];
 let deck = [], drawIndex = 0, drawnCards = [], table = [], currentRoundPlacedCards = 0;
-let moveCount = 0, score = 0, comboCount = 0, lastPlaceTime = 0, highScore = Number(localStorage.getItem("highScore")) || 0;
+let moveCount = 0, score = 0, comboCount = 0, highScore = Number(localStorage.getItem("highScore")) || 0;
 let startTime, timerInterval, selectedCard = null, completedSuits = [], lastDrawCount = 0, undoEnabled = false;
-let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint")), jokerUsed = false, soundEnabled = 0;
+let difficultyLevel = 3, hintTimeout = null, autoHintEnabled = Number(localStorage.getItem("autoHint")), jokerUsed = false;
 
 const seriesInfo = [
     { suit: "♥", direction: "asc", label: "As ♥", card_image: "ace_of_hearts.png" },
@@ -15,13 +15,6 @@ const seriesInfo = [
     { suit: "♦", direction: "desc", label: "Papaz ♦", card_image: "ace_of_diamonds.png" },
     { suit: "♠", direction: "desc", label: "Papaz ♠", card_image: "ace_of_clubs.png" },
 ];
-
-const toggleDebugPanel = () => {
-    const debugPanel = document.getElementById("debugPanel");
-    debugPanel.style.display = debug ? "block" : "none";
-};
-
-toggleDebugPanel();
 
 function createDeck() {
     const winModal = document.getElementById("winModal");
@@ -45,6 +38,7 @@ function createDeck() {
     }
 
     updateUI();
+    updateJokerButtonState();
     renderDeckStack();
     startTime = Date.now();
     clearInterval(timerInterval);
@@ -57,6 +51,7 @@ function shuffle(array) {
 }
 
 function drawThree() {
+
     comboCount = 0;
     document.getElementById("status").innerText = "";
 
@@ -105,30 +100,52 @@ function drawThree() {
     }
 
     // Now show drawn cards with animation
-    updateDrawnCardsAnimated(drawAnimations);
+    animateCardDraw(drawAnimations);
+    updateJokerButtonState();
 
     renderDeckStack();
 }
 
-function useJoker() {
-    if (jokerUsed) {
-        document.getElementById("status").innerText = t("statusJokerAlready", { n: 3 });
+function undoDraw() {
+
+    if (!undoEnabled) {
+        document.getElementById("status").innerText = t("statusUndoBlocked", { n: 3 });
+        setAnimationState(false);
         return;
     }
 
-    if (drawIndex >= deck.length) {
-        document.getElementById("status").innerText = t("statusJokerEmpty", { n: 3 });
+    if (lastDrawCount === 0 || drawnCards.length < lastDrawCount) {
+        document.getElementById("status").innerText = t("statusUndoNone", { n: 3 });
+        setAnimationState(false);
         return;
     }
 
-    // Joker mantığı: sıradaki kartı sona taşı
-    const card = deck.splice(drawIndex, 1)[0];
-    deck.push(card);
+    const deckEl = document.getElementById("deck");
+    const deckRect = deckEl.getBoundingClientRect();
+    const drawnDiv = document.getElementById("drawnCards");
+    const cardsToReturn = drawnCards.slice(-lastDrawCount);
+    const existingCards = [...drawnDiv.querySelectorAll("img")];
 
-    jokerUsed = true;
-    document.getElementById("useJoker").disabled = true;
-    document.getElementById("status").innerText = t("statusJokerUsed", { n: 3 });
-    updateUI();
+    drawnCards.splice(-lastDrawCount, lastDrawCount);
+
+    animateUndoDraw(cardsToReturn, existingCards, deckRect, drawnDiv);
+}
+
+function checkSuitCompletion(suit) {
+    if (completedSuits.includes(suit)) return;
+
+    const relatedSeriesIndexes = seriesInfo
+        .map((s, i) => (s.suit === suit ? i : -1))
+        .filter(i => i !== -1);
+
+    const totalCards = relatedSeriesIndexes.reduce((sum, i) => sum + table[i].length, 0);
+
+    if (totalCards === 13) {
+        completedSuits.push(suit);
+        score += 100;
+        updateCounters();
+        document.getElementById("status").innerText = `🎉 ${suit} serisi tamamlandı! +100 puan`;
+    }
 }
 
 function canPlaceCardOnSeries(seriesIndex, card) {
@@ -148,6 +165,8 @@ function canPlaceCardOnSeries(seriesIndex, card) {
 }
 
 function placeCardOnSeries(index) {
+
+    updateJokerButtonState();
     if (drawnCards.length === 0) return;
 
     if (hintTimeout) clearTimeout(hintTimeout);
@@ -223,79 +242,6 @@ function placeCardOnSeries(index) {
     }
 }
 
-function undoDraw() {
-    if (!undoEnabled) {
-        document.getElementById("status").innerText = t("statusUndoBlocked", { n: 3 });
-        return;
-    }
-
-    if (lastDrawCount === 0 || drawnCards.length < lastDrawCount) {
-        document.getElementById("status").innerText = t("statusUndoNone", { n: 3 });
-        return;
-    }
-
-    const deckEl = document.getElementById("deck");
-    const deckRect = deckEl.getBoundingClientRect();
-    const drawnDiv = document.getElementById("drawnCards");
-
-    const cardsToReturn = drawnCards.slice(-lastDrawCount);
-    drawnCards.splice(-lastDrawCount, lastDrawCount);
-
-    const existingCards = [...drawnDiv.querySelectorAll("img")];
-    const flyingBackCards = [];
-
-    let animationsCompleted = 0;
-
-    cardsToReturn.forEach((card, i) => {
-        const img = existingCards[i];
-        const fromRect = img.getBoundingClientRect();
-
-        const flying = document.createElement("img");
-        flying.src = cardImageFile(card);
-        flying.className = "flying-card";
-        flying.style.position = "fixed";
-        flying.style.left = fromRect.left + "px";
-        flying.style.top = fromRect.top + "px";
-        flying.style.width = "80px";
-        flying.style.height = "120px";
-        flying.style.zIndex = 100 + i;
-        document.body.appendChild(flying);
-
-        const dx = (deckRect.left + deckRect.width / 2 - 35) - fromRect.left;
-        const dy = (deckRect.top + deckRect.height / 2 - 55) - fromRect.top;
-
-        anime({
-            targets: flying,
-            translateX: dx,
-            translateY: dy,
-            opacity: 0.5,
-            duration: 500,
-            delay: i * 150,
-            easing: "easeOutExpo",
-            complete: () => {
-                flyingBackCards.push(flying);
-                animationsCompleted++;
-
-                // ✅ When all cards are back to deck
-                if (animationsCompleted === cardsToReturn.length) {
-                    flyingBackCards.forEach(card => card.remove());
-
-                    // Clean up drawn area
-                    drawnDiv.innerHTML = "";
-
-                    drawIndex -= lastDrawCount;
-                    updateUI();
-
-                    document.getElementById("status").innerText = t("statusUndoDone", { n: 3 });
-                    lastDrawCount = 0;
-                    undoEnabled = false;
-                    selectedCard = null;
-                }
-            }
-        });
-    });
-}
-
 function tryAutoPlaceCard(card) {
     let targetIndex = -1;
     for (let i = 0; i < table.length; i++) {
@@ -313,21 +259,25 @@ function tryAutoPlaceCard(card) {
     animateCardToSeries(card, targetIndex);
 }
 
-function checkSuitCompletion(suit) {
-    if (completedSuits.includes(suit)) return;
-
-    const relatedSeriesIndexes = seriesInfo
-        .map((s, i) => (s.suit === suit ? i : -1))
-        .filter(i => i !== -1);
-
-    const totalCards = relatedSeriesIndexes.reduce((sum, i) => sum + table[i].length, 0);
-
-    if (totalCards === 13) {
-        completedSuits.push(suit);
-        score += 100;
-        updateCounters();
-        document.getElementById("status").innerText = `🎉 ${suit} serisi tamamlandı! +100 puan`;
+function useJoker() {
+    if (jokerUsed) {
+        document.getElementById("status").innerText = t("statusJokerAlready", { n: 3 });
+        return;
     }
+
+    if (drawIndex >= deck.length) {
+        document.getElementById("status").innerText = t("statusJokerEmpty", { n: 3 });
+        return;
+    }
+
+    // Joker mantığı: sıradaki kartı sona taşı
+    const card = deck.splice(drawIndex, 1)[0];
+    deck.push(card);
+
+    jokerUsed = true;
+    document.getElementById("useJoker").disabled = true;
+    document.getElementById("status").innerText = t("statusJokerUsed", { n: 3 });
+    updateUI();
 }
 
 function showHint() {
